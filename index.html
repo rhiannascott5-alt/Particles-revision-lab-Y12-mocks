@@ -1,0 +1,670 @@
+<!doctype html><html><head><meta charset=utf8><meta name=viewport content="width=device-width,initial-scale=1,viewport-fit=cover"><style>:root{color-scheme:light;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}html{scroll-padding-top:env(safe-area-inset-top,0px)}body{margin:0;padding:0;font:14px -apple-system,BlinkMacSystemFont,sans-serif;background:#fff;color:#000}img{max-width:100%}[hidden]:not([hidden=until-found i]){display:none!important}</style></head><body>
+<title>Atoms & Radioactivity Lab</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Atkinson+Hyperlegible:ital,wght@0,400;0,700;1,400&family=Familjen+Grotesk:wght@500;600;700&family=JetBrains+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: lab-bench pages — sticky spec-referenced tab strip; each topic = oscilloscope-style sim + breakdown side by side, flip-card questions beneath. */
+:root{
+  --paper:#f4f7f6; --surface:#ffffff; --ink:#16212c; --muted:#56636f; --line:#d5dde2; --grid:#e6edf0;
+  --accent:#1f5fbf; --accent-soft:#e3ecfa; --wave2:#cf5c17; --node:#c2263d; --good:#1b7a4c; --good-soft:#e2f3ea; --warn-soft:#fbeee4;
+  --f-display:"Familjen Grotesk", "Helvetica Neue", Arial, sans-serif;
+  --f-body:"Atkinson Hyperlegible", "Segoe UI", system-ui, sans-serif;
+  --f-mono:"JetBrains Mono", ui-monospace, Menlo, Consolas, monospace;
+}
+@media (prefers-color-scheme: dark){:root:not([data-theme="light"]){
+  --paper:#0f151b; --surface:#151d25; --ink:#e5ecf1; --muted:#93a1ad; --line:#2a3540; --grid:#1c2630;
+  --accent:#72a6ff; --accent-soft:#1a2a44; --wave2:#ff9a5c; --node:#ff6b80; --good:#4cc38a; --good-soft:#15302a; --warn-soft:#33241a; color-scheme:dark}}
+:root[data-theme="dark"]{
+  --paper:#0f151b; --surface:#151d25; --ink:#e5ecf1; --muted:#93a1ad; --line:#2a3540; --grid:#1c2630;
+  --accent:#72a6ff; --accent-soft:#1a2a44; --wave2:#ff9a5c; --node:#ff6b80; --good:#4cc38a; --good-soft:#15302a; --warn-soft:#33241a; color-scheme:dark}
+
+*{box-sizing:border-box}
+body{background:var(--paper);color:var(--ink);font-family:var(--f-body);font-size:16px;line-height:1.55}
+body::before{content:"";position:fixed;inset:0 0 auto;height:env(safe-area-inset-top,0px);z-index:10;background:var(--paper)}
+.wrap{max-width:1180px;margin:0 auto;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+header.top{padding-block:28px 14px}
+.eyebrow{font-family:var(--f-mono);font-size:12px;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+h1{font-family:var(--f-display);font-weight:700;font-size:clamp(28px,4.4vw,42px);line-height:1.08;margin:6px 0 8px;text-wrap:balance;letter-spacing:-.01em}
+h1 .sig{display:inline-block;vertical-align:middle;margin-left:6px}
+.lede{color:var(--muted);max-width:68ch;margin:0}
+h2{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1.15;margin:0;text-wrap:balance}
+h3{font-family:var(--f-display);font-weight:600;font-size:18px;margin:0 0 8px}
+
+nav.tabs{position:sticky;top:env(safe-area-inset-top,0px);z-index:5;background:var(--paper);border-bottom:1px solid var(--line)}
+.tabrow{display:flex;gap:4px;overflow-x:auto;scrollbar-width:thin;padding-block:8px 0}
+.tab{flex:0 0 auto;border:1px solid transparent;border-bottom:none;background:none;color:var(--muted);font:inherit;cursor:pointer;padding:8px 14px 10px;border-radius:8px 8px 0 0;text-align:left;display:flex;flex-direction:column;gap:1px;position:relative;top:1px}
+.tab .ref{font-family:var(--f-mono);font-size:11px;letter-spacing:.04em}
+.tab .nm{font-family:var(--f-display);font-weight:600;font-size:15px;color:var(--ink)}
+.tab:hover .nm{color:var(--accent)}
+.tab[aria-selected="true"]{background:var(--surface);border-color:var(--line);color:var(--accent)}
+.tab[aria-selected="true"] .nm{color:var(--accent)}
+.tab.practice .nm::before{content:"✎ ";}
+.tab:focus-visible,button:focus-visible,input:focus-visible,.chip:focus-visible{outline:2px solid var(--accent);outline-offset:2px}
+
+main{padding-block:22px 60px}
+.panel-head{display:flex;flex-wrap:wrap;align-items:end;justify-content:space-between;gap:8px 20px;margin-bottom:18px}
+.panel-head p{margin:4px 0 0;color:var(--muted);max-width:70ch}
+.lab{display:grid;grid-template-columns:minmax(0,1.15fr) minmax(0,1fr);gap:22px;align-items:start}
+@media (max-width:900px){.lab{grid-template-columns:minmax(0,1fr)}}
+
+.scope{background:var(--surface);border:1px solid var(--line);border-radius:12px;overflow:hidden}
+.scope-bar{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:8px 12px;border-bottom:1px solid var(--line);font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.scope canvas{display:block;width:100%}
+.controls{display:grid;grid-template-columns:repeat(auto-fit,minmax(200px,1fr));gap:12px 18px;padding:14px 14px 4px}
+.ctl label{display:flex;justify-content:space-between;gap:8px;font-size:14px;color:var(--muted)}
+.ctl label output{font-family:var(--f-mono);color:var(--ink);font-size:13px}
+.ctl input[type=range]{width:100%;accent-color:var(--accent);margin:4px 0 0}
+.toggles{display:flex;flex-wrap:wrap;gap:8px;padding:10px 14px 4px}
+.seg{display:inline-flex;border:1px solid var(--line);border-radius:8px;overflow:hidden}
+.seg button{border:none;background:var(--surface);color:var(--muted);font:inherit;font-size:14px;padding:6px 12px;cursor:pointer}
+.seg button[aria-pressed="true"]{background:var(--accent);color:var(--surface)}
+.check{display:inline-flex;align-items:center;gap:6px;font-size:14px;color:var(--muted);padding:6px 4px}
+.check input{accent-color:var(--accent);width:16px;height:16px}
+.readout{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:1px;background:var(--line);border-top:1px solid var(--line);margin-top:12px}
+.readout div{background:var(--surface);padding:10px 12px}
+.readout dt{font-size:12px;color:var(--muted);font-family:var(--f-mono);letter-spacing:.03em}
+.readout dd{margin:2px 0 0;font-family:var(--f-mono);font-size:15px;font-variant-numeric:tabular-nums}
+.status{padding:10px 14px;font-size:14px;border-top:1px solid var(--line)}
+.status b{font-family:var(--f-display)}
+.pause{border:1px solid var(--line);background:var(--paper);color:var(--ink);font:inherit;font-size:12px;font-family:var(--f-mono);padding:3px 10px;border-radius:6px;cursor:pointer}
+
+.notes{display:flex;flex-direction:column;gap:16px;min-width:0}
+.eqbox{background:var(--accent-soft);border-radius:10px;padding:12px 14px}
+.eqbox h3{font-size:14px;font-family:var(--f-mono);font-weight:500;letter-spacing:.05em;text-transform:uppercase;color:var(--accent);margin-bottom:6px}
+.eq{font-family:var(--f-mono);font-size:15px;display:flex;flex-wrap:wrap;gap:6px 22px}
+.steps{counter-reset:s;list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:10px}
+.steps li{counter-increment:s;display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px}
+.steps li::before{content:counter(s);font-family:var(--f-mono);font-size:12px;width:24px;height:24px;border-radius:50%;border:1.5px solid var(--accent);color:var(--accent);display:grid;place-items:center;margin-top:1px}
+.traps{background:var(--warn-soft);border-radius:10px;padding:12px 14px}
+.traps h3{color:var(--wave2);font-size:14px;font-family:var(--f-mono);font-weight:500;letter-spacing:.05em;text-transform:uppercase;margin-bottom:6px}
+.traps ul{margin:0;padding-left:18px;display:flex;flex-direction:column;gap:6px}
+.try{font-size:14px;color:var(--muted);border-left:3px solid var(--line);padding-left:10px}
+.try b{color:var(--ink)}
+
+.qhead{display:flex;flex-wrap:wrap;align-items:baseline;justify-content:space-between;gap:8px;margin:36px 0 12px;border-top:1px solid var(--line);padding-top:22px}
+.qhead p{margin:0;color:var(--muted);font-size:14px}
+.qgrid{display:grid;grid-template-columns:repeat(auto-fill,minmax(320px,1fr));gap:14px}
+@media (max-width:420px){.qgrid{grid-template-columns:minmax(0,1fr)}}
+.qcard{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:14px 16px;display:flex;flex-direction:column;gap:10px;min-width:0}
+.qcard.flipped{border-color:var(--good);background:linear-gradient(var(--good-soft),var(--good-soft)) top/100% 4px no-repeat, var(--surface)}
+.qmeta{display:flex;justify-content:space-between;gap:8px;font-family:var(--f-mono);font-size:12px;color:var(--muted)}
+.qmeta .mk{color:var(--accent)}
+.qcard.flipped .qmeta .side{color:var(--good)}
+.qbody{flex:1;min-width:0}
+.qbody p{margin:0 0 8px}
+.qbody p:last-child{margin-bottom:0}
+.qbody ol,.qbody ul{margin:4px 0 8px;padding-left:20px}
+.qbody .opts{list-style:upper-alpha;padding-left:24px}
+.ans .work{font-family:var(--f-mono);font-size:13.5px;background:var(--paper);border-radius:8px;padding:8px 10px;margin:6px 0;overflow-x:auto;white-space:pre-wrap}
+.ans .final{font-weight:700;color:var(--good)}
+.flip{align-self:flex-start;border:1px solid var(--accent);background:none;color:var(--accent);font:inherit;font-size:14px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer}
+.flip:hover{background:var(--accent);color:var(--surface)}
+.qcard.flipped .flip{border-color:var(--good);color:var(--good)}
+.qcard.flipped .flip:hover{background:var(--good);color:var(--surface)}
+
+.filters{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:16px;align-items:center}
+.chip{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14px;padding:5px 12px;border-radius:999px;cursor:pointer}
+.chip[aria-pressed="true"]{background:var(--ink);color:var(--paper);border-color:var(--ink)}
+.tally{margin-left:auto;font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.ghost{border:1px solid var(--line);background:none;color:var(--muted);font:inherit;font-size:13px;padding:5px 12px;border-radius:8px;cursor:pointer}
+.tagline{font-family:var(--f-mono);font-size:11px;letter-spacing:.04em;text-transform:uppercase;color:var(--muted)}
+sub,sup{font-size:.72em;line-height:0}
+footer{color:var(--muted);font-size:13px;padding-block:0 40px}
+@media (prefers-reduced-motion: reduce){*{scroll-behavior:auto!important}}
+
+.extra{padding:12px 14px 2px;display:flex;flex-direction:column;gap:10px}
+.extra select,.extra input[type=number],.extra input[type=text]{font:inherit;font-size:14px;padding:5px 8px;border:1px solid var(--line);border-radius:6px;background:var(--surface);color:var(--ink);max-width:100%}
+.extra .row{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.extra .row label{font-size:14px;color:var(--muted)}
+.btn{border:1px solid var(--accent);background:var(--accent);color:var(--surface);font:inherit;font-size:14px;font-weight:700;padding:6px 14px;border-radius:8px;cursor:pointer}
+.btn.alt{background:none;color:var(--accent)}
+.mini{width:100%;border-collapse:collapse;font-size:14px;font-variant-numeric:tabular-nums}
+.mini th,.mini td{border-bottom:1px solid var(--line);padding:5px 8px;text-align:left}
+.mini th{font-family:var(--f-mono);font-size:12px;color:var(--muted);font-weight:500}
+.tblwrap{overflow-x:auto}
+.ok{color:var(--good);font-weight:700}.bad{color:var(--node);font-weight:700}
+.crumb{font-family:var(--f-mono);font-size:12px;color:var(--muted);text-decoration:none}
+.crumb:hover{color:var(--accent)}
+/* attempt-gated question cards */
+.qcard textarea.attempt{font:inherit;font-size:14px;width:100%;min-height:68px;resize:vertical;border:1px solid var(--line);border-radius:8px;padding:8px 10px;background:var(--paper);color:var(--ink)}
+.qcard textarea.attempt::placeholder{color:var(--muted)}
+.optlist{display:flex;flex-direction:column;gap:6px}
+.opt{display:grid;grid-template-columns:28px minmax(0,1fr);gap:8px;align-items:start;text-align:left;border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:14.5px;padding:7px 10px;border-radius:8px;cursor:pointer}
+.opt .lt{font-family:var(--f-mono);font-weight:500;color:var(--muted)}
+.opt:hover{border-color:var(--accent)}
+.opt[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.opt.right{border-color:var(--good);background:var(--good-soft)}
+.opt.right .lt{color:var(--good)}
+.opt.wrong{border-color:var(--node);background:var(--warn-soft)}
+.opt.wrong .lt{color:var(--node)}
+.optlist.locked .opt{cursor:default}
+.cardfoot{display:flex;flex-wrap:wrap;align-items:center;gap:8px 12px}
+.hint{font-size:13px;color:var(--muted)}
+.flip:disabled{opacity:.45;cursor:not-allowed}
+.flip:disabled:hover{background:none;color:var(--accent)}
+.ansbox{border-top:1px dashed var(--line);padding-top:10px}
+.selfmark{display:flex;flex-wrap:wrap;gap:6px;align-items:center;font-size:13px;color:var(--muted)}
+.selfmark button{border:1px solid var(--line);background:var(--surface);color:var(--ink);font:inherit;font-size:13px;padding:4px 10px;border-radius:999px;cursor:pointer}
+.selfmark button[aria-pressed="true"][data-s="got"]{background:var(--good);border-color:var(--good);color:var(--surface)}
+.selfmark button[aria-pressed="true"][data-s="rev"]{background:var(--wave2);border-color:var(--wave2);color:var(--surface)}
+.qcard.got{border-color:var(--good)}
+.qcard.rev{border-color:var(--wave2)}
+.qtally{font-family:var(--f-mono);font-size:13px;color:var(--muted)}
+.ptable{width:100%;border-collapse:collapse;font-size:14px}
+.ptable th,.ptable td{border-bottom:1px solid var(--line);padding:5px 6px;text-align:left;vertical-align:top}
+.ptable th{font-family:var(--f-mono);font-size:11.5px;color:var(--muted);font-weight:500;letter-spacing:.03em}
+.feedback{font-size:14px;padding:8px 10px;border-radius:8px;background:var(--paper)}
+.scope-tools{display:flex;gap:6px;align-items:center}
+.nucl{font-family:var(--f-display)}
+</style>
+<div id="app"></div>
+<script>
+/* ---------- shared helpers ---------- */
+const $=id=>document.getElementById(id);
+const sims={},Q={},TOPICS=[];let SECTION={};
+let C={};
+function readTokens(){const s=getComputedStyle(document.documentElement);
+  ['paper','surface','ink','muted','line','grid','accent','accent-soft','wave2','node','good'].forEach(n=>C[n]=s.getPropertyValue('--'+n).trim());}
+function hexRgb(h){h=(h||'#000').replace('#','');if(h.length===3)h=h.split('').map(x=>x+x).join('');const n=parseInt(h,16);return[(n>>16)&255,(n>>8)&255,n&255]}
+function alpha(hex,a){const[r,g,b]=hexRgb(hex);return `rgba(${r},${g},${b},${a})`}
+function nmRgb(nm){let r=0,g=0,b=0;
+  if(nm<440){r=-(nm-440)/40;b=1}else if(nm<490){g=(nm-440)/50;b=1}else if(nm<510){g=1;b=-(nm-510)/20}
+  else if(nm<580){r=(nm-510)/70;g=1}else if(nm<645){r=1;g=-(nm-645)/65}else{r=1}
+  let f=nm<420?0.3+0.7*(nm-380)/40:nm>680?0.3+0.7*(780-nm)/100:1;
+  return [Math.round(255*r*f),Math.round(255*g*f),Math.round(255*b*f)];}
+const rgbStr=(c,a=1)=>`rgba(${c[0]},${c[1]},${c[2]},${a})`;
+const fmt=(x,d=2)=>Number(x).toFixed(d);
+const SUP='⁰¹²³⁴⁵⁶⁷⁸⁹';
+function sci(x,d=2){if(!isFinite(x))return '—';if(x===0)return'0';let e=Math.floor(Math.log10(Math.abs(x)));let m=x/10**e;if(Math.abs(+m.toFixed(d))>=10){m/=10;e++}
+  if(e>=-2&&e<=3)return (+x.toPrecision(d+1)).toString();
+  return `${m.toFixed(d)} × 10${String(e).replace('-','⁻').replace(/\d/g,c=>SUP[c])}`}
+function sizeCanvas(c,aspect,minH){
+  const w=c.clientWidth||c.parentElement.clientWidth||600; const h=Math.max(minH||0,Math.round(w*aspect));
+  const dpr=Math.min(2,window.devicePixelRatio||1);
+  if(c._w!==w||c._h!==h){c.style.height=h+'px';c.width=Math.round(w*dpr);c.height=Math.round(h*dpr);c._w=w;c._h=h}
+  const ctx=c.getContext('2d');ctx.setTransform(dpr,0,0,dpr,0,0);return{ctx,w,h};}
+function bg(ctx,w,h,grid=true){ctx.fillStyle=C.surface;ctx.fillRect(0,0,w,h);if(!grid)return;ctx.strokeStyle=C.grid;ctx.lineWidth=1;ctx.beginPath();
+  for(let x=0.5;x<w;x+=20){ctx.moveTo(x,0);ctx.lineTo(x,h)}for(let y=0.5;y<h;y+=20){ctx.moveTo(0,y);ctx.lineTo(w,y)}ctx.stroke();}
+function label(ctx,t,x,y,col,align='center',size=12,weight=500){ctx.fillStyle=col||C.ink;ctx.font=`${weight} ${size}px "JetBrains Mono", ui-monospace, monospace`;ctx.textAlign=align;ctx.textBaseline='middle';ctx.fillText(t,x,y)}
+function dot(ctx,x,y,r,col){ctx.fillStyle=col;ctx.beginPath();ctx.arc(x,y,r,0,7);ctx.fill()}
+function line(ctx,x1,y1,x2,y2,col,w=1.5,dash){ctx.strokeStyle=col;ctx.lineWidth=w;if(dash)ctx.setLineDash(dash);ctx.beginPath();ctx.moveTo(x1,y1);ctx.lineTo(x2,y2);ctx.stroke();if(dash)ctx.setLineDash([])}
+function arrowHead(ctx,x,y,ang,s,col){ctx.fillStyle=col;ctx.beginPath();ctx.moveTo(x,y);ctx.lineTo(x-s*Math.cos(ang-0.4),y-s*Math.sin(ang-0.4));ctx.lineTo(x-s*Math.cos(ang+0.4),y-s*Math.sin(ang+0.4));ctx.closePath();ctx.fill()}
+function arrow(ctx,x1,y1,x2,y2,col,w=2,head=9){line(ctx,x1,y1,x2,y2,col,w);if(Math.hypot(x2-x1,y2-y1)>2)arrowHead(ctx,x2,y2,Math.atan2(y2-y1,x2-x1),head,col)}
+function rrect(ctx,x,y,w,h,r){ctx.beginPath();ctx.moveTo(x+r,y);ctx.arcTo(x+w,y,x+w,y+h,r);ctx.arcTo(x+w,y+h,x,y+h,r);ctx.arcTo(x,y+h,x,y,r);ctx.arcTo(x,y,x+w,y,r);ctx.closePath()}
+/* graph helper: box {x,y,w,h} in px, ranges [min,max] */
+function Plot(ctx,box,xr,yr){const P={
+  X:v=>box.x+(v-xr[0])/(xr[1]-xr[0])*box.w, Y:v=>box.y+box.h-(v-yr[0])/(yr[1]-yr[0])*box.h,
+  axes(xlab,ylab,xt=[],yt=[],xf=v=>v,yf=v=>v){ctx.strokeStyle=C.muted;ctx.lineWidth=1;ctx.beginPath();
+    const y0=yr[0]<=0&&yr[1]>=0?P.Y(0):box.y+box.h, x0=xr[0]<=0&&xr[1]>=0?P.X(0):box.x;
+    ctx.moveTo(box.x,y0);ctx.lineTo(box.x+box.w,y0);ctx.moveTo(x0,box.y);ctx.lineTo(x0,box.y+box.h);ctx.stroke();
+    xt.forEach(v=>{const x=P.X(v);line(ctx,x,y0,x,y0+4,C.muted,1);label(ctx,xf(v),x,y0+13,C.muted,'center',10)});
+    yt.forEach(v=>{const y=P.Y(v);line(ctx,x0-4,y,x0,y,C.muted,1);label(ctx,yf(v),x0-7,y,C.muted,'right',10)});
+    if(xlab)label(ctx,xlab,box.x+box.w,y0+(y0>box.y+box.h-20?-10:26),C.muted,'right',10);
+    if(ylab)label(ctx,ylab,x0+6,box.y-8,C.muted,'left',10);},
+  curve(f,col,w=2,a=xr[0],b=xr[1],n=200){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();let first=true;
+    for(let i=0;i<=n;i++){const x=a+(b-a)*i/n,y=f(x);if(!isFinite(y)){first=true;continue}const py=Math.max(box.y-2,Math.min(box.y+box.h+2,P.Y(y)));first?ctx.moveTo(P.X(x),py):ctx.lineTo(P.X(x),py);first=false}ctx.stroke();},
+  pts(arr,col,w=2){ctx.strokeStyle=col;ctx.lineWidth=w;ctx.beginPath();arr.forEach((p,i)=>i?ctx.lineTo(P.X(p[0]),P.Y(p[1])):ctx.moveTo(P.X(p[0]),P.Y(p[1])));ctx.stroke();}
+ };return P;}
+function segVal(id){const b=document.querySelector(`#${id} button[aria-pressed="true"]`);return b?b.dataset.v:null}
+function setSeg(id,v){document.querySelectorAll(`#${id} button`).forEach(b=>b.setAttribute('aria-pressed',b.dataset.v===v))}
+const num=id=>+$(id).value;
+function setOut(id,txt){const o=$(id+'-o');if(o)o.textContent=txt}
+function setLabel(id,txt){const l=document.querySelector(`label[for="${id}"]`);if(l)l.firstChild.textContent=txt+' '}
+function topic(t){TOPICS.push(t)}
+
+// TITLE: Atoms & Radioactivity Lab
+SECTION={code:'Section 3.3 · mock exam topics',name:'atoms and radioactivity',title:'Atoms & Radioactivity Lab',
+ lede:'The particles content for the PH01 mock: the structure of the atom, isotopes, specific charge, the discovery of the nucleus, alpha, beta and gamma radiation, background radiation, half-life, and the uses and dangers of radioactivity. Each tab has a simulation, a breakdown of the topic, key misconceptions and exam-style questions. Write your answer first, then check it.',
+ footer:'Constants: e = 1.60 × 10⁻¹⁹ C, proton and neutron mass ≈ 1.67 × 10⁻²⁷ kg, electron mass = 9.11 × 10⁻³¹ kg. Not included here because they are not on the mock: antiparticles, pair production, annihilation, neutrinos and the inverse-square law.'};
+const EC=1.6e-19,MN=1.67e-27,MEL=9.11e-31;
+
+/* ===== ATOMS, ISOTOPES & SPECIFIC CHARGE ===== */
+const ELS=[['H','hydrogen'],['He','helium'],['Li','lithium'],['Be','beryllium'],['B','boron'],['C','carbon'],['N','nitrogen'],['O','oxygen'],['F','fluorine'],['Ne','neon'],
+ ['Na','sodium'],['Mg','magnesium'],['Al','aluminium'],['Si','silicon'],['P','phosphorus'],['S','sulfur'],['Cl','chlorine'],['Ar','argon'],['K','potassium'],['Ca','calcium']];
+const APRE={'Carbon-12 atom':[6,6,6],'Carbon-14 atom':[6,8,6],'Hydrogen-1 atom':[1,0,1],'Hydrogen-2 (deuterium) atom':[1,1,1],'Hydrogen-3 (tritium) atom':[1,2,1],
+ 'Proton':[1,0,0],'Alpha particle (helium-4 nucleus)':[2,2,0],'Lithium ion, Li⁺':[3,4,2],'Oxide ion, O²⁻':[8,8,10],'Sodium-23 atom':[11,12,11],'Chlorine-35 atom':[17,18,17],'Chlorine-37 atom':[17,20,17]};
+const supN=n=>String(n).replace(/\d/g,c=>SUP[c]);
+const SUBS='₀₁₂₃₄₅₆₇₈₉';const subN=n=>String(n).replace(/\d/g,c=>SUBS[c]);
+topic({id:'atom',ref:'3.3.1',name:'Atoms & isotopes',short:'Atoms',eyebrow:'Constituents of the atom',title:'Build an atom: isotopes, ions and specific charge',
+ intro:'Add protons, neutrons and electrons. The simulation names what you have made, writes its nuclide notation and calculates its specific charge.',animated:true,
+ bar:'not to scale: a real nucleus is about 100 000 times smaller than the atom',aspect:0.56,minH:270,
+ extra:`<div class="row"><label for="at-pre">Load an example</label><select id="at-pre"><option value="">Choose…</option>${Object.keys(APRE).map(k=>`<option>${k}</option>`).join('')}</select></div>`,
+ controls:[{id:'at-z',label:'Protons (Z)',min:1,max:20,step:1,value:6,fmt:v=>v},{id:'at-n',label:'Neutrons (N)',min:0,max:24,step:1,value:6,fmt:v=>v},{id:'at-e',label:'Electrons',min:0,max:22,step:1,value:6,fmt:v=>v}],
+ readouts:[{id:'at-what',label:'what it is',wide:true},{id:'at-q',label:'charge Q'},{id:'at-m',label:'mass m'},{id:'at-sn',label:'specific charge of nucleus'},{id:'at-sp',label:'specific charge of whole particle'}],status:true,
+ eqTitle:'Key equations and data',eqs:['specific charge = Q / m  (C kg⁻¹)','A = Z + N','proton: +1.60 × 10⁻¹⁹ C, 1.67 × 10⁻²⁷ kg','neutron: 0 C, 1.67 × 10⁻²⁷ kg','electron: −1.60 × 10⁻¹⁹ C, 9.11 × 10⁻³¹ kg'],
+ steps:['An atom has a tiny, dense, positively charged <b>nucleus</b> made of protons and neutrons (<b>nucleons</b>), with electrons outside it. Most of the atom is empty space.',
+  'Relative charges: proton +1, neutron 0, electron −1. Relative masses: proton 1, neutron 1, electron about 1/1840.',
+  '<b>Proton number Z</b> = number of protons; it decides the element. <b>Nucleon number A</b> = protons + neutrons. Nuclide notation writes A on top and Z below: ¹⁴₆C.',
+  '<b>Isotopes</b> have the same number of protons but different numbers of neutrons. They have the same chemistry (same electrons) but different masses, and some are unstable.',
+  'An <b>ion</b> has gained or lost electrons. Lost electrons → positive ion; gained electrons → negative ion. The nucleus is unchanged.',
+  '<b>Specific charge</b> = charge ÷ mass, in C kg⁻¹. For a nucleus, Q = Z × 1.60 × 10⁻¹⁹ C and m ≈ A × 1.67 × 10⁻²⁷ kg. The electron has the largest specific charge: 1.76 × 10¹¹ C kg⁻¹.'],
+ traps:['Using the nucleon number A for the charge. Only protons are charged, so Q = Ze.','Forgetting that a neutron has a specific charge of zero (no charge).','For an ion, the charge comes from the <b>missing or extra electrons</b>, not from the protons.','Giving specific charge without units, or in "C" only. It is C kg⁻¹.','Thinking isotopes are different elements. Same Z means same element.'],
+ tryThis:'load Carbon-12 then Carbon-14. Which readouts change, and which stay the same? Then remove all the electrons and compare the specific charge of the nucleus.'});
+sims.atom=(()=>{let st={};
+ return{init(){$('at-pre').addEventListener('change',()=>{const p=APRE[$('at-pre').value];if(!p)return;$('at-z').value=p[0];$('at-n').value=p[1];$('at-e').value=p[2];TOPICS.find(t=>t.id==='atom')._upd()})},
+ update(){const Z=num('at-z'),N=num('at-n'),ne=num('at-e'),A=Z+N,q=(Z-ne)*EC,m=A*MN+ne*MEL;st={Z,N,ne,A,q,m};
+  const [sym,nm]=ELS[Z-1];const net=Z-ne;st.sym=sym;st.net=net;
+  let kind;if(ne===0)kind=(Z===1&&N===0)?'a proton (hydrogen-1 nucleus)':(Z===2&&N===2)?'an alpha particle (helium-4 nucleus)':`a bare ${nm}-${A} nucleus`;
+  else if(net===0)kind=`a neutral ${nm}-${A} atom`;else if(net>0)kind=`a positive ${nm} ion (lost ${net} electron${net>1?'s':''})`;else kind=`a negative ${nm} ion (gained ${-net} electron${net<-1?'s':''})`;
+  $('at-what').textContent=kind[0].toUpperCase()+kind.slice(1);
+  $('at-q').textContent=net===0?'0 C':`${net>0?'+':'−'}${sci(Math.abs(q))} C`;
+  $('at-m').textContent=sci(m)+' kg';$('at-sn').textContent=sci(Z*EC/(A*MN))+' C kg⁻¹';
+  $('at-sp').textContent=net===0?'0 (no overall charge)':sci(Math.abs(q)/m)+' C kg⁻¹';
+  const odd=(Z>1&&N<Z-1)||N>1.6*Z+2||(Z===1&&N>2);
+  $('atom-status').innerHTML=(odd?'<b>Unusual nucleus.</b> Real nuclei with this neutron-to-proton balance are very unstable or do not exist. ':'')+
+   `<b>${A} nucleons</b>: ${Z} proton${Z>1?'s':''} + ${N} neutron${N!==1?'s':''}. Changing the neutrons makes a different <b>isotope</b> of ${nm}; changing the protons makes a different <b>element</b>; changing the electrons makes an <b>ion</b>.`;},
+ draw(ctx,w,h,t){bg(ctx,w,h,false);const cx=w*0.3,cy=h*0.52,R=Math.min(w*0.27,h*0.46);
+  const shells=[2,8,8,4];let left=st.ne;const radii=[0.42,0.64,0.84,1.0];
+  radii.forEach((f,i)=>{ctx.strokeStyle=C.line;ctx.lineWidth=1;ctx.beginPath();ctx.arc(cx,cy,R*f,0,7);ctx.stroke()});
+  // nucleus
+  const s=Math.max(3.2,Math.min(6,R*0.05));const types=[];let p=st.Z,n=st.N;for(let i=0;i<st.A;i++){const wantP=p/(p+n||1);if((i*0.618)%1<wantP&&p>0||n===0){types.push('p');p--}else{types.push('n');n--}}
+  types.forEach((ty,i)=>{const r=s*1.05*Math.sqrt(i),a=i*2.39996;dot(ctx,cx+r*Math.cos(a),cy+r*Math.sin(a),s,ty==='p'?C.node:C.muted)});
+  // electrons
+  shells.forEach((cap,i)=>{const k=Math.min(cap,left);left-=k;for(let j=0;j<k;j++){const a=t*(0.6-i*0.1)+j*2*Math.PI/k+i;dot(ctx,cx+R*radii[i]*Math.cos(a),cy+R*radii[i]*Math.sin(a),3.6,C.accent)}});
+  if(left>0)label(ctx,`+${left} more electrons`,cx,cy+R+12,C.accent,'center',10);
+  label(ctx,'● proton',12,14,C.node,'left',11);label(ctx,'● neutron',80,14,C.muted,'left',11);label(ctx,'● electron',156,14,C.accent,'left',11);
+  // notation
+  const nx=w*0.72,ny=h*0.42,fs=Math.min(64,w*0.09);ctx.fillStyle=C.ink;ctx.textBaseline='alphabetic';ctx.textAlign='left';
+  ctx.font=`700 ${fs}px "Familjen Grotesk", Arial, sans-serif`;ctx.fillText(st.sym,nx,ny+fs*0.35);const sw=ctx.measureText(st.sym).width;
+  ctx.font=`600 ${fs*0.42}px "JetBrains Mono", monospace`;ctx.textAlign='right';ctx.fillText(String(st.A),nx-4,ny-fs*0.25);ctx.fillText(String(st.Z),nx-4,ny+fs*0.42);
+  ctx.textAlign='left';if(st.net!==0)ctx.fillText((Math.abs(st.net)>1?Math.abs(st.net):'')+(st.net>0?'+':'−'),nx+sw+4,ny-fs*0.25);
+  label(ctx,'A = nucleon number',nx-4,ny+fs*0.9,C.muted,'center',11);label(ctx,'Z = proton number',nx-4,ny+fs*0.9+16,C.muted,'center',11);}}})();
+Q.atom=[
+ {m:2,q:`<p>State the number of protons, neutrons and electrons in a neutral atom of ⁵⁶₂₆Fe.</p>`,a:`<p class="final">26 protons, 30 neutrons, 26 electrons</p><p>N = A − Z = 56 − 26. A neutral atom has as many electrons as protons.</p>`},
+ {m:3,q:`<p>Calculate the specific charge of a ⁷₃Li nucleus.</p>`,a:`<div class="work">Q = 3 × 1.60×10⁻¹⁹ = 4.80 × 10⁻¹⁹ C
+m = 7 × 1.67×10⁻²⁷ = 1.17 × 10⁻²⁶ kg
+Q/m = 4.80×10⁻¹⁹ / 1.17×10⁻²⁶</div><p class="final">4.1 × 10⁷ C kg⁻¹</p>`},
+ {m:3,q:`<p>An oxygen atom, ¹⁶₈O, gains two electrons to become an ion. Calculate the magnitude of the specific charge of the ion.</p>`,a:`<div class="work">Q = 2 × 1.60×10⁻¹⁹ = 3.20 × 10⁻¹⁹ C   (from the 2 extra electrons)
+m = 16 × 1.67×10⁻²⁷ + 2 × 9.11×10⁻³¹ ≈ 2.67 × 10⁻²⁶ kg
+Q/m = 3.20×10⁻¹⁹ / 2.67×10⁻²⁶</div><p class="final">1.2 × 10⁷ C kg⁻¹</p><p>The electrons' mass makes almost no difference.</p>`},
+ {m:1,opts:['proton','electron','alpha particle','neutron'],key:'B',q:`<p>Which particle has the largest specific charge?</p>`,a:`<p>The electron has the same size of charge as a proton but about 1/1840 of the mass: 1.76 × 10¹¹ C kg⁻¹.</p>`},
+ {m:2,q:`<p>Explain what is meant by <b>isotopes</b>, and why two isotopes of an element have the same chemical properties.</p>`,a:`<ul><li>Isotopes are nuclei (atoms) with the <b>same number of protons</b> but a <b>different number of neutrons</b>.</li><li>They have the same number (and arrangement) of electrons, and chemistry depends on the electrons.</li></ul>`},
+ {m:1,opts:['protons','neutrons','electrons in a neutral atom','protons and nucleons'],key:'B',q:`<p>Uranium-235 (²³⁵₉₂U) and uranium-238 (²³⁸₉₂U) have different numbers of:</p>`,a:`<p>Both have Z = 92, so the same number of protons (and electrons in a neutral atom). U-235 has 143 neutrons; U-238 has 146.</p>`}];
+
+/* ===== RUTHERFORD SCATTERING ===== */
+topic({id:'rutherford',ref:'3.3.1',name:'Discovery of the nucleus',short:'Rutherford',eyebrow:'Rutherford scattering',title:'Firing alpha particles at gold foil',
+ intro:'Alpha particles are fired at thin gold foil in a vacuum. Compare what the plum pudding model predicts with the nuclear model, and watch how often an alpha particle bounces back.',animated:true,
+ bar:'close-up of one atom in the foil',aspect:0.56,minH:280,
+ segs:[{id:'ru-model',opts:[['nuc','Nuclear model'],['plum','Plum pudding model']]},{id:'ru-foil',opts:[['79','Gold foil'],['13','Aluminium foil']]}],
+ checks:[{id:'ru-trail',label:'Show paths',checked:true}],
+ controls:[{id:'ru-E',label:'Alpha particle energy',min:3,max:8,step:0.5,value:5,fmt:v=>fmt(v,1)+' MeV'}],
+ extra:`<div class="row"><button class="btn alt" type="button" id="ru-reset">Reset counts</button><span class="hint">Counts come from a detector moved around the foil.</span></div>`,
+ readouts:[{id:'ru-n',label:'alpha particles fired'},{id:'ru-a',label:'deflected < 10°'},{id:'ru-b',label:'deflected 10° to 90°'},{id:'ru-c',label:'deflected > 90°'}],status:true,
+ eqTitle:'What was observed',eqs:['most pass straight through','a few are deflected through small angles','about 1 in 8000 are deflected by more than 90°'],
+ steps:['<b>Plum pudding model</b> (Thomson): the atom is a sphere of positive charge with electrons spread through it. The charge and mass are spread out, so it predicts only tiny deflections.',
+  '<b>The experiment</b>: a beam of alpha particles from a radioactive source is fired at very thin gold foil in a <b>vacuum</b>. A detector (a fluorescent screen viewed through a microscope, so each hit is a tiny flash) is moved to count alpha particles at different angles.',
+  'Most alpha particles go <b>straight through</b>, so the atom is mostly <b>empty space</b>.',
+  'Some are deflected, so the centre of the atom is <b>charged</b>. Alpha particles are positive and are repelled, so the nucleus is <b>positive</b>.',
+  'A very small number bounce back (more than 90°). Only a <b>tiny</b> region holding <b>most of the mass</b> and all the positive charge could do this. This is the <b>nucleus</b>.',
+  'Why the conditions matter: a <b>vacuum</b> stops alpha particles losing energy to air (their range in air is only a few cm). <b>Thin</b> foil means each alpha particle is scattered by one nucleus and is not absorbed.'],
+ traps:['Saying alpha particles bounce off electrons. Electrons are far too light to deflect them noticeably.','Saying the nucleus "attracts" alpha particles. Both are positive, so they repel.','Mixing up observation and conclusion. "Most went straight through" is the observation; "the atom is mostly empty space" is the conclusion.','The experiment does not show neutrons. They were discovered later (Chadwick, 1932).'],
+ tryThis:'switch to the plum pudding model and fire a few hundred alpha particles. Does anything come back? Then try aluminium foil (smaller nuclear charge) in the nuclear model.'});
+sims.rutherford=(()=>{let al=[],acc=0,cnt={n:0,a:0,b:0,c:0},vacc=0;
+ const reset=()=>{cnt={n:0,a:0,b:0,c:0};al=[]};
+ const params=()=>{const Z=+segVal('ru-foil'),E=num('ru-E');return{Z,E,nuc:segVal('ru-model')==='nuc'}};
+ return{init(){$('ru-reset').addEventListener('click',()=>{reset();this.update()})},onSeg(){reset()},
+ update(){const p=params();$('ru-n').textContent=cnt.n.toLocaleString();
+  const pc=k=>cnt.n?` (${(100*cnt[k]/cnt.n).toFixed(k==='c'?3:1)}%)`:'';
+  $('ru-a').textContent=cnt.a.toLocaleString()+pc('a');$('ru-b').textContent=cnt.b.toLocaleString()+pc('b');$('ru-c').textContent=cnt.c.toLocaleString()+pc('c');
+  $('rutherford-status').innerHTML=p.nuc?`<b>Nuclear model.</b> Nearly all the positive charge and mass are in a tiny nucleus. Only alpha particles that pass very close to it are deflected strongly${p.Z<50?'. With aluminium (Z = 13) the repulsion is weaker, so fewer are deflected by large angles':''}.`:
+   `<b>Plum pudding model.</b> The positive charge is spread out, so the electric force on an alpha particle is always small. Every alpha particle passes through with a deflection of less than 1°. This does not match what Geiger and Marsden saw.`;},
+ step(dt){const p=params();
+  // statistics from many virtual alpha particles across the foil
+  vacc+=dt*900;const k=Math.floor(vacc);vacc-=k;const dd=(1/44.7)*(p.Z/79)*(5/p.E);
+  for(let i=0;i<k;i++){cnt.n++;let th;if(p.nuc){const b=Math.sqrt(Math.random());th=2*Math.atan(dd/(2*Math.max(b,1e-6)))*180/Math.PI}else th=Math.random()*0.8;
+   if(th<10)cnt.a++;else if(th<90)cnt.b++;else cnt.c++}
+  // visible particles
+  acc+=dt*4;const hs=this.hs||0.4;while(acc>1){acc--;al.push({x:0,y:(Math.random()-0.5)*1.8*hs,vx:1,vy:0,tr:[],kick:(Math.random()-0.5)*0.004})}
+  const d=0.05*(p.Z/79)*(5/p.E),K=d/2;const sub=40,h=dt*0.55/sub;
+  al.forEach(a=>{for(let s=0;s<sub;s++){if(p.nuc){const rx=a.x-0.55,ry=a.y,r2=rx*rx+ry*ry,r=Math.sqrt(r2);const f=K/(r2*r);a.vx+=f*rx*h;a.vy+=f*ry*h}
+    else if(Math.abs(a.x-0.55)<0.01)a.vy+=a.kick*0.04;a.x+=a.vx*h;a.y+=a.vy*h}
+   a.tr.push([a.x,a.y]);if(a.tr.length>220)a.tr.shift()});
+  al=al.filter(a=>a.x>-0.05&&a.x<1.05&&Math.abs(a.y)<(this.hs||0.4)*1.1);this.update();},
+ draw(ctx,w,h){bg(ctx,w,h,false);const p=params(),vw=w*0.64,cx=vw*0.55/1.0,cy=h/2,S=vw;
+  const X=x=>x*S,Y=y=>cy+y*S;this.hs=(h/2)/S;
+  if(p.nuc){dot(ctx,X(0.55),cy,Math.max(4,6*Math.sqrt(p.Z/79)),C.node);label(ctx,'nucleus (+)',X(0.55),cy+18,C.node,'center',10);
+   for(let i=0;i<6;i++){const a=i*1.05;dot(ctx,X(0.55)+Math.cos(a)*h*0.38,cy+Math.sin(a)*h*0.38,2.5,C.accent)}}
+  else{ctx.fillStyle=alpha(C.node,0.12);ctx.beginPath();ctx.arc(X(0.55),cy,h*0.42,0,7);ctx.fill();label(ctx,'positive charge spread out',X(0.55),cy+h*0.42-10,C.node,'center',10);
+   for(let i=0;i<14;i++){const a=i*2.4,r=h*0.36*Math.sqrt((i+0.5)/14);dot(ctx,X(0.55)+Math.cos(a)*r,cy+Math.sin(a)*r,2.5,C.accent)}}
+  const tr=$('ru-trail').checked;
+  ctx.save();ctx.beginPath();ctx.rect(0,0,vw,h);ctx.clip();
+  al.forEach(a=>{if(tr&&a.tr.length>1){ctx.strokeStyle=alpha(C.wave2,0.45);ctx.lineWidth=1.2;ctx.beginPath();a.tr.forEach((q,i)=>i?ctx.lineTo(X(q[0]),Y(q[1])):ctx.moveTo(X(q[0]),Y(q[1])));ctx.stroke()}dot(ctx,X(a.x),Y(a.y),3.2,C.wave2)});
+  ctx.restore();label(ctx,'α beam →',8,14,C.wave2,'left',11);line(ctx,vw,0,vw,h,C.line,1);
+  // detector counts, log bars
+  const bx=vw+16,bw=w-bx-14,rows=[['< 10°',cnt.a],['10°–90°',cnt.b],['> 90°',cnt.c]];label(ctx,'detector counts (log scale)',bx,16,C.muted,'left',10);
+  const mx=Math.log10(Math.max(10,cnt.n));rows.forEach((r,i)=>{const y=40+i*((h-70)/3);label(ctx,r[0],bx,y,C.ink,'left',12,700);
+   const L=r[1]>0?Math.log10(r[1]+1)/mx:0;ctx.fillStyle=i===2?C.node:i===1?C.wave2:C.accent;ctx.fillRect(bx,y+12,Math.max(2,bw*L),14);label(ctx,r[1].toLocaleString(),bx,y+40,C.muted,'left',11)});}}})();
+Q.rutherford=[
+ {m:3,q:`<p>Describe what was observed when a beam of alpha particles was directed at a thin gold foil.</p>`,a:`<ul><li>Most alpha particles passed straight through (undeflected).</li><li>Some were deflected through small angles.</li><li>A very small number were deflected through more than 90° (came back towards the source).</li></ul>`},
+ {m:3,q:`<p>For each observation in the Rutherford scattering experiment, state what it showed about the structure of the atom.</p>`,a:`<ul><li>Most passed straight through → the atom is mostly <b>empty space</b>.</li><li>Some were deflected → the centre of the atom is <b>charged</b>; repulsion of positive alpha particles shows it is <b>positive</b>.</li><li>Very few bounced back → the positive charge and most of the <b>mass</b> are concentrated in a very <b>small</b> volume: the nucleus.</li></ul>`},
+ {m:2,q:`<p>Explain why the apparatus in the Rutherford scattering experiment was kept in a vacuum.</p>`,a:`<p>Alpha particles collide with air molecules and lose energy; their range in air is only a few centimetres. Without a vacuum they would be slowed, scattered or absorbed by air before reaching the foil or the detector.</p>`},
+ {m:1,opts:['It passes straight through the nucleus.','It is deflected through a small angle.','It slows down, stops momentarily and returns along its original path.','It is captured by the nucleus.'],key:'C',q:`<p>An alpha particle travels directly towards a gold nucleus. What happens?</p>`,a:`<p>The repulsive force slows it down until it stops briefly at its closest approach, then pushes it straight back.</p>`},
+ {m:2,q:`<p>Explain why the plum pudding model cannot explain alpha particles being deflected through more than 90°.</p>`,a:`<p>In the plum pudding model the positive charge (and mass) are spread through the whole atom, so the electric force on a passing alpha particle is always small. A small force can only cause a small deflection, not turn the alpha particle back.</p>`},
+ {m:2,q:`<p>Suggest why the gold foil used was only a few atoms thick.</p>`,a:`<ul><li>So alpha particles could pass through and were not absorbed by the foil.</li><li>So each alpha particle was deflected by just one nucleus, making the results easier to interpret.</li></ul>`}];
+
+/* ===== ALPHA, BETA, GAMMA ===== */
+const RAD={a:{nm:'α',col:()=>C.node,base:1400,range:5,T:{none:1,paper:0,al:0,pb:0}},b:{nm:'β⁻',col:()=>C.accent,base:900,range:99,T:{none:1,paper:0.95,al:0.01,pb:0}},g:{nm:'γ',col:()=>C.wave2,base:260,range:99,T:{none:1,paper:1,al:0.97,pb:0.25}}};
+const SRC={a:['a'],b:['b'],g:['g']};const BKG=25;
+topic({id:'radiation',ref:'3.3.3',name:'Alpha, beta & gamma',short:'α β γ',eyebrow:'Properties of radiation',title:'Identify radiation with absorbers',
+ intro:'Put different absorbers between a source and a Geiger–Müller tube and watch what gets through. Then try the mystery source and work out what it emits.',animated:true,
+ bar:'source → absorber → GM tube',aspect:0.45,minH:240,
+ segs:[{id:'rd-src',opts:[['a','α source'],['b','β⁻ source'],['g','γ source'],['m','Mystery source']]},{id:'rd-abs',opts:[['none','No absorber'],['paper','Paper'],['al','3 mm aluminium'],['pb','2 cm lead']]}],
+ checks:[{id:'rd-bkg',label:'Include background',checked:true}],
+ controls:[{id:'rd-d',label:'Source to detector distance',min:2,max:20,step:1,value:4,fmt:v=>v+' cm'}],
+ extra:`<div class="row"><b>Mystery source:</b><label class="check"><input type="checkbox" id="rd-ga"> α</label><label class="check"><input type="checkbox" id="rd-gb"> β⁻</label><label class="check"><input type="checkbox" id="rd-gg"> γ</label>
+  <button class="btn" type="button" id="rd-check">Check my answer</button><button class="btn alt" type="button" id="rd-new">New mystery source</button></div><div class="feedback" id="rd-fb">Select <b>Mystery source</b>, take readings with each absorber, then tick what you think it emits.</div>`,
+ readouts:[{id:'rd-meas',label:'measured count rate'},{id:'rd-bg',label:'background'},{id:'rd-cor',label:'corrected count rate'},{id:'rd-thru',label:'getting through'}],status:true,
+ eqTitle:'Properties',eqs:['α: helium nucleus ⁴₂He, charge +2','β⁻: fast electron from the nucleus, charge −1','γ: high-energy EM wave (photon), no charge','corrected count rate = measured − background'],
+ steps:['<b>Alpha</b> is 2 protons + 2 neutrons. It is the most <b>ionising</b>, so it loses energy quickly: a range of a few cm in air, and it is stopped by a sheet of <b>paper</b> or skin.',
+  '<b>Beta-minus</b> is a fast electron emitted when a neutron in the nucleus changes into a proton. It is moderately ionising, travels about 1 m in air, and is stopped by a few mm of <b>aluminium</b>.',
+  '<b>Gamma</b> is high-energy electromagnetic radiation emitted when a nucleus loses energy. It is the least ionising and the most penetrating: it is only <b>reduced</b> by thick lead or concrete, never stopped completely.',
+  'To identify a source, measure the <b>background</b> first, then the count rate with no absorber, paper, aluminium and lead. A big drop with paper → α. A big drop with aluminium → β. Counts still above background through aluminium → γ.',
+  '<b>Decay equations</b>. α: A goes down by 4 and Z by 2, e.g. ²²⁶₈₈Ra → ²²²₈₆Rn + ⁴₂α. β⁻: A is unchanged and Z goes up by 1, e.g. ¹⁴₆C → ¹⁴₇N + ⁰₋₁β. γ emission changes neither A nor Z.',
+  'The more ionising a radiation is, the more <b>damage</b> it does to the cells it reaches, and the shorter its range.'],
+ traps:['Saying gamma is "stopped" by lead. Lead only reduces it.','Forgetting to subtract background before deciding whether anything got through.','Moving the detector more than a few cm away: alpha would not reach it anyway, so you might miss alpha in a source.','Thinking a beta particle is an electron from the electron shells. It comes from the nucleus.','Saying alpha is the most penetrating because it is the "biggest". It is the least penetrating.'],
+ tryThis:'with the β⁻ source, compare paper and aluminium. Then load the mystery source and find what it emits using only the absorbers, with the distance kept at 3 cm.'});
+sims.radiation=(()=>{let pts=[],acc={a:0,b:0,g:0},meas=0,noiseT=0,mys=['b','g'];
+ const pick=()=>{const all=[['a'],['b'],['g'],['a','g'],['b','g'],['a','b'],['a','b','g']];mys=all[Math.floor(Math.random()*all.length)]};
+ const comp=()=>{const s=segVal('rd-src');return s==='m'?mys:SRC[s]};
+ const expected=k=>{const d=num('rd-d'),ab=segVal('rd-abs'),R=RAD[k];if(d>R.range)return 0;return R.base*Math.pow(4/d,2)*R.T[ab]};
+ return{init(){pick();$('rd-new').addEventListener('click',()=>{pick();['rd-ga','rd-gb','rd-gg'].forEach(i=>$(i).checked=false);$('rd-fb').innerHTML='New mystery source loaded. Take readings with each absorber.';setSeg('rd-src','m');TOPICS.find(t=>t.id==='radiation')._upd()});
+  $('rd-check').addEventListener('click',()=>{const g=[['a','rd-ga'],['b','rd-gb'],['g','rd-gg']].filter(x=>$(x[1]).checked).map(x=>x[0]);const ok=g.length===mys.length&&g.every(x=>mys.includes(x));
+   $('rd-fb').innerHTML=ok?`<span class="ok">Correct.</span> The mystery source emits ${mys.map(k=>RAD[k].nm).join(' and ')}.`:`<span class="bad">Not quite.</span> Look again at how the corrected count rate changes from no absorber → paper → aluminium → lead.`;});},
+ update(){const k=comp(),bk=$('rd-bkg').checked?BKG:0;const ex=k.reduce((s,x)=>s+expected(x),0);this.ex=ex+bk;this.bk=bk;
+  noiseT=99;$('rd-bg').textContent=bk+' counts min⁻¹';
+  const thru=k.filter(x=>expected(x)>1).map(x=>RAD[x].nm);const show=segVal('rd-src')!=='m';
+  $('rd-thru').textContent=show?(thru.length?thru.join(' + '):'nothing'):'?';
+  const ab=segVal('rd-abs'),d=num('rd-d');const msg={none:'No absorber: everything the source emits that can cross the air gap reaches the tube.',paper:'Paper stops α. β⁻ and γ pass through almost unaffected.',al:'3 mm of aluminium stops β⁻ as well. Only γ gets through.',pb:'2 cm of lead reduces γ but does not stop it completely.'}[ab];
+  $('radiation-status').innerHTML=msg+(d>5?' <b>Note:</b> α has a range of only about 5 cm in air, so at this distance it cannot reach the tube.':'');},
+ step(dt){noiseT+=dt;if(noiseT>1.2){noiseT=0;meas=Math.max(0,Math.round(this.ex+Math.sqrt(this.ex+1)*((Math.random()+Math.random()+Math.random()-1.5)*1.4)));
+   $('rd-meas').textContent=meas+' counts min⁻¹';$('rd-cor').textContent=Math.max(0,meas-this.bk)+' counts min⁻¹'}
+  comp().forEach(k=>{acc[k]+=dt*(k==='g'?7:10);while(acc[k]>1){acc[k]--;pts.push({k,x:0,y:(Math.random()-0.5)*0.5,v:k==='a'?0.35:k==='b'?0.8:1.1,ph:Math.random()*6})}});
+  const ab=segVal('rd-abs'),d=num('rd-d');
+  pts.forEach(p=>{p.x+=p.v*dt;p.y+=(p.k==='b'?(Math.random()-0.5)*0.12:0)*dt*6;
+   const absX=1.3/22;if(!p.dead&&p.x>absX&&!p.passAbs){const T=RAD[p.k].T[ab];if(Math.random()>T)p.dead=true;p.passAbs=true}
+   const xcm=p.x*22;if(p.k==='a'&&xcm>RAD.a.range)p.dead=true;if(xcm>d)p.dead=true;});
+  pts=pts.filter(p=>!p.dead&&p.x<1);},
+ draw(ctx,w,h,t){bg(ctx,w,h,false);const d=num('rd-d'),ab=segVal('rd-abs');const x0=40,L=w-80,cmx=cm=>x0+cm/22*L,cy=h*0.48;
+  // ruler
+  line(ctx,x0,h-26,x0+L,h-26,C.muted,1);for(let c=0;c<=22;c+=2){line(ctx,cmx(c),h-26,cmx(c),h-21,C.muted,1);label(ctx,c,cmx(c),h-12,C.muted,'center',9)}label(ctx,'cm',x0+L+14,h-12,C.muted,'center',9);
+  // source
+  ctx.fillStyle=C.ink;rrect(ctx,x0-28,cy-14,28,28,4);ctx.fill();label(ctx,'source',x0-14,cy+26,C.muted,'center',10);
+  // absorber
+  const ax=cmx(1.2);if(ab!=='none'){const col=ab==='paper'?alpha(C.muted,0.35):ab==='al'?alpha(C.accent,0.35):alpha(C.ink,0.65);const ww=ab==='paper'?3:ab==='al'?7:16;ctx.fillStyle=col;ctx.fillRect(ax,cy-h*0.3,ww,h*0.6);
+   label(ctx,{paper:'paper',al:'Al',pb:'lead'}[ab],ax+ww/2,cy-h*0.3-10,C.muted,'center',10)}
+  // alpha range marker
+  line(ctx,cmx(5),cy-h*0.36,cmx(5),cy+h*0.36,alpha(C.node,0.4),1,[3,4]);label(ctx,'α range in air ≈ 5 cm',cmx(5)+4,cy-h*0.36+6,C.node,'left',9);
+  // detector
+  const dx=cmx(d);ctx.fillStyle=C.surface;ctx.strokeStyle=C.ink;ctx.lineWidth=2;rrect(ctx,dx,cy-16,Math.min(70,w-dx-8),32,6);ctx.fill();ctx.stroke();label(ctx,'GM tube',dx+Math.min(35,(w-dx-8)/2),cy,C.ink,'center',10);
+  // particles
+  const myst=segVal('rd-src')==='m';pts.forEach(p=>{const x=x0+p.x*L,y=cy+p.y*h*0.55;if(x>dx)return;const col=myst?C.muted:RAD[p.k].col();
+   if(myst)dot(ctx,x,y,3,col);else if(p.k==='g'){ctx.strokeStyle=col;ctx.lineWidth=1.8;ctx.beginPath();for(let s=-12;s<=0;s++){const yy=y+3*Math.sin(s*1.1+t*25+p.ph);s===-12?ctx.moveTo(x+s,yy):ctx.lineTo(x+s,yy)}ctx.stroke()}
+   else dot(ctx,x,y,p.k==='a'?4.5:2.6,col)});
+  label(ctx,'● α',x0,14,C.node,'left',11);label(ctx,'● β⁻',x0+40,14,C.accent,'left',11);label(ctx,'∿ γ',x0+88,14,C.wave2,'left',11);}}})();
+Q.radiation=[
+ {m:3,q:`<p>State what each of the following consists of: (a) an alpha particle, (b) a beta-minus particle, (c) gamma radiation.</p>`,a:`<ul><li>(a) 2 protons and 2 neutrons (a helium-4 nucleus).</li><li>(b) A fast-moving electron emitted from the nucleus.</li><li>(c) High-energy (short-wavelength) electromagnetic radiation.</li></ul>`},
+ {m:3,q:`<p>A student records these count rates from a source. The background count rate is 20 counts min⁻¹.</p><div class="tblwrap"><table class="ptable"><tr><th>Absorber</th><th>Count rate / counts min⁻¹</th></tr><tr><td>none</td><td>820</td></tr><tr><td>paper</td><td>815</td></tr><tr><td>3 mm aluminium</td><td>64</td></tr><tr><td>2 cm lead</td><td>22</td></tr></table></div><p>Deduce which types of radiation the source emits. Explain your reasoning.</p>`,a:`<ul><li>Paper causes no significant drop → <b>no alpha</b>.</li><li>Aluminium causes a large drop (815 → 64) → <b>beta</b> is emitted.</li><li>The count through aluminium (64) is well above background (20), and lead reduces it further → <b>gamma</b> is emitted.</li></ul><p class="final">beta and gamma</p>`},
+ {m:1,opts:['alpha','beta-minus','gamma','they are all equally ionising'],key:'A',q:`<p>Which radiation is the most strongly ionising?</p>`,a:`<p>Alpha has the largest charge and mass and moves relatively slowly, so it produces the most ions per cm and has the shortest range.</p>`},
+ {m:2,q:`<p>Radium-226 (Z = 88) decays by alpha emission to radon (Rn). Write the nucleon number and proton number of the radon nucleus produced.</p>`,a:`<p class="final">²²²₈₆Rn: A = 222, Z = 86</p><p>Alpha emission takes away 4 nucleons and 2 protons.</p>`},
+ {m:2,q:`<p>Strontium-90 (⁹⁰₃₈Sr) decays by beta-minus emission to yttrium (Y). Write an equation for the decay.</p>`,a:`<p class="final">⁹⁰₃₈Sr → ⁹⁰₃₉Y + ⁰₋₁β</p><p>A is unchanged; Z increases by 1 because a neutron changes into a proton.</p>`},
+ {m:2,q:`<p>Explain why an alpha source is the least hazardous outside the body but the most hazardous inside it.</p>`,a:`<ul><li>Outside: alpha is stopped by a few cm of air or by the dead outer layer of skin, so it does not reach living cells.</li><li>Inside: it is strongly ionising and all its energy is absorbed by nearby living cells, causing a lot of damage.</li></ul>`}];
+
+/* ===== HALF-LIFE & BACKGROUND ===== */
+topic({id:'halflife',ref:'3.3.3',name:'Half-life & background',short:'Half-life',eyebrow:'Radioactive decay',title:'Random decay, half-life and corrected count rate',
+ intro:'Each dot is an unstable nucleus. Decay is random, but the sample still halves at a steady rate. The graph shows the count rate a detector would measure, including background.',animated:true,
+ bar:'400 unstable nuclei',aspect:0.5,minH:260,
+ checks:[{id:'hl-bkg',label:'Background radiation',checked:true},{id:'hl-cor',label:'Show corrected count rate',checked:true},{id:'hl-mark',label:'Mark the half-lives',checked:false}],
+ controls:[{id:'hl-T',label:'Half-life',min:1,max:6,step:0.5,value:3,fmt:v=>fmt(v,1)+' min'}],
+ extra:`<div class="row"><button class="btn" type="button" id="hl-reset">Start a new sample</button><span class="hint">Changing the half-life starts a new sample.</span></div>`,
+ readouts:[{id:'hl-t',label:'time'},{id:'hl-N',label:'undecayed nuclei'},{id:'hl-pred',label:'N₀ ÷ 2ⁿ'},{id:'hl-meas',label:'measured count rate'},{id:'hl-c',label:'corrected count rate'}],status:true,
+ eqTitle:'Key ideas',eqs:['after n half-lives: N = N₀ / 2ⁿ','activity halves every half-life','corrected = measured − background'],
+ steps:['Radioactive decay is <b>random</b>. You cannot predict which nucleus will decay next, or when. Each nucleus has the same chance of decaying per second.',
+  'Because there are so many nuclei, the overall behaviour is predictable. The <b>half-life</b> is the time for the number of undecayed nuclei, or the <b>activity</b>, to halve.',
+  'After n half-lives the fraction left is 1/2ⁿ: ½, ¼, ⅛, 1/16 …. The count rate measured by a detector falls in the same way.',
+  '<b>Background radiation</b> is always present. Natural sources: radon gas from rocks, rocks and soil, cosmic rays, food and drink. Artificial sources: medical X-rays and scans, nuclear weapons testing and accidents.',
+  'Measure the background with the source removed, ideally over several minutes, and <b>subtract</b> it from every reading to get the <b>corrected count rate</b>. Use corrected values to find the half-life.',
+  'To find half-life from a graph: read the starting corrected count rate, find the time to fall to half, and repeat from another point. Take the <b>mean</b> of several readings.'],
+ traps:['Using measured (uncorrected) count rates to find the half-life. The background does not halve, so the answer is too long.','Thinking that after two half-lives everything has decayed. A quarter is left.','Saying "half the atoms decay in each half-life, so the sample loses half its mass". Decayed nuclei become new nuclei, which stay in the sample.','Reading only one half-life from a graph. Taking several and averaging is more accurate.'],
+ tryThis:'turn on "Mark the half-lives". Compare the measured and the corrected points near the end of the run. Which one levels off, and why?'});
+sims.halflife=(()=>{let nuc=[],t=0,bins=[],bin={dec:0,bg:0,t0:0},flash=[];const N0=400,BIN=0.5,BG=14;
+ const lam=()=>Math.LN2/num('hl-T');
+ const reset=()=>{nuc=Array.from({length:N0},()=>({d:false,f:0}));t=0;bins=[];bin={dec:0,bg:0,t0:0}};
+ return{init(){reset();$('hl-reset').addEventListener('click',()=>{reset();this.update()});$('hl-T').addEventListener('change',()=>{reset();this.update()})},
+ update(){const N=nuc.filter(n=>!n.d).length,T=num('hl-T'),n=t/T;$('hl-t').textContent=fmt(t,1)+' min';$('hl-N').textContent=N;$('hl-pred').textContent=fmt(N0/Math.pow(2,n),0)+'  (n = '+fmt(n,2)+')';
+  const last=bins[bins.length-1];$('hl-meas').textContent=last?fmt(last.m,0)+' counts min⁻¹':'—';$('hl-c').textContent=last?fmt(last.c,0)+' counts min⁻¹':'—';
+  $('halflife-status').innerHTML=t>=20?'<b>Run finished.</b> Start a new sample to run it again: the points will not be exactly the same, because decay is random.':
+   `<b>${N} nuclei left.</b> In each 0.5-minute interval the detector counts the decays${$('hl-bkg').checked?' plus background':''}. The points scatter because decay is random, but they follow the halving curve.`;},
+ step(dt){if(t>=20)return;const st=dt*1.2,l=lam();t+=st;nuc.forEach(n=>{if(!n.d&&Math.random()<l*st){n.d=true;n.f=1;bin.dec++}});nuc.forEach(n=>{if(n.f>0)n.f-=dt*2});
+  if($('hl-bkg').checked&&Math.random()<BG*st)bin.bg++;
+  if(t-bin.t0>=BIN){const m=(bin.dec+bin.bg)/BIN,bgm=$('hl-bkg').checked?BG:0;bins.push({t:bin.t0+BIN/2,m,c:Math.max(0,m-bgm)});bin={dec:0,bg:0,t0:bin.t0+BIN}}
+  this.update();},
+ draw(ctx,w,h){bg(ctx,w,h,false);const gw=Math.min(w*0.36,h*0.9),cs=gw/20,ox=14,oy=(h-gw)/2;
+  nuc.forEach((n,i)=>{const x=ox+(i%20+0.5)*cs,y=oy+(Math.floor(i/20)+0.5)*cs;if(n.d){dot(ctx,x,y,cs*0.18,C.line);if(n.f>0)dot(ctx,x,y,cs*0.42,alpha(C.wave2,n.f))}else dot(ctx,x,y,cs*0.36,C.accent)});
+  const T=num('hl-T'),A0=lam()*N0,ymax=Math.ceil((A0+BG+20)/20)*20;const P=Plot(ctx,{x:ox+gw+48,y:24,w:w-(ox+gw+48)-14,h:h-60},[0,20],[0,ymax]);
+  P.axes('time / min','count rate / counts min⁻¹',[0,5,10,15,20],[0,Math.round(ymax/2/10)*10,Math.round(ymax/10)*10]);
+  ctx.setLineDash([5,4]);P.curve(x=>A0*Math.pow(2,-x/T),C.muted,1.3,0,20);ctx.setLineDash([]);
+  if($('hl-bkg').checked){line(ctx,P.X(0),P.Y(BG),P.X(20),P.Y(BG),alpha(C.wave2,0.6),1,[2,3]);label(ctx,'background',P.X(20),P.Y(BG)-8,C.wave2,'right',9)}
+  if($('hl-mark').checked){for(let k=1;k<=3;k++){const x=k*T;if(x>20)break;const y=A0/Math.pow(2,k);line(ctx,P.X(0),P.Y(y),P.X(x),P.Y(y),alpha(C.node,0.6),1,[3,3]);line(ctx,P.X(x),P.Y(y),P.X(x),P.Y(0),alpha(C.node,0.6),1,[3,3]);label(ctx,k+'T½',P.X(x),P.Y(0)-8,C.node,'center',9)}}
+  bins.forEach(b=>{dot(ctx,P.X(b.t),P.Y(Math.min(ymax,b.m)),3,C.wave2);if($('hl-cor').checked)dot(ctx,P.X(b.t),P.Y(Math.min(ymax,b.c)),3,C.accent)});
+  label(ctx,'● measured',P.X(20),34,C.wave2,'right',10);if($('hl-cor').checked)label(ctx,'● corrected',P.X(20),48,C.accent,'right',10);label(ctx,'- - expected',P.X(20),62,C.muted,'right',10);}}})();
+Q.halflife=[
+ {m:1,q:`<p>Define the <b>half-life</b> of a radioactive isotope.</p>`,a:`<p>The (average) time taken for the number of undecayed nuclei of that isotope, or its activity, to halve.</p>`},
+ {m:2,q:`<p>A sample has an activity of 3200 Bq. Its half-life is 6 hours. Calculate its activity after 24 hours.</p>`,a:`<div class="work">24 h ÷ 6 h = 4 half-lives
+3200 → 1600 → 800 → 400 → 200</div><p class="final">200 Bq</p>`},
+ {m:3,q:`<p>A detector near a source measures 520 counts min⁻¹. The background count rate is 40 counts min⁻¹. Thirty minutes later the detector measures 160 counts min⁻¹. Calculate the half-life of the source.</p>`,a:`<div class="work">corrected: 520 − 40 = 480 ;  160 − 40 = 120
+480 → 240 → 120 is 2 half-lives in 30 min</div><p class="final">15 min</p><p>Using the uncorrected values would give the wrong answer.</p>`},
+ {m:1,opts:['1/5','1/10','1/16','1/32'],key:'D',q:`<p>What fraction of the original undecayed nuclei remains after 5 half-lives?</p>`,a:`<p>(½)⁵ = 1/32.</p>`},
+ {m:2,q:`<p>Explain what is meant by saying that radioactive decay is <b>random</b>, and give one piece of evidence for this from count-rate measurements.</p>`,a:`<ul><li>It is impossible to predict which nucleus will decay next, or when; each nucleus has the same chance of decaying in a given time.</li><li>Evidence: repeated readings of the count rate over equal time intervals fluctuate around an average.</li></ul>`},
+ {m:3,q:`<p>Name two natural sources and one artificial source of background radiation.</p>`,a:`<ul><li>Natural (any two): radon gas, rocks and soil (e.g. granite), cosmic rays, food and drink, building materials.</li><li>Artificial (any one): medical X-rays or scans, fallout from nuclear weapons testing, nuclear accidents or waste.</li></ul>`}];
+
+/* ===== USES & SAFETY ===== */
+const GAUGE={paper:{nm:'paper',r:[0.05,0.25],u:'mm',mu:{a:400,b:7,g:0.002}},al:{nm:'aluminium foil',r:[0.05,0.4],u:'mm',mu:{a:400,b:4.5,g:0.008}},steel:{nm:'steel sheet',r:[2,20],u:'mm',mu:{a:400,b:25,g:0.055}}};
+const TRACERS={'':['',''],tc:['Technetium-99m: γ, half-life 6 hours','<span class="ok">Good choice.</span> Gamma passes out of the body to the camera and is weakly ionising. A 6-hour half-life lasts long enough for the scan but the activity falls quickly afterwards.'],
+ am:['Americium-241: α, half-life 430 years','<span class="bad">Unsuitable.</span> Alpha cannot escape the body to reach the detector, and it is strongly ionising, so it would damage cells. The long half-life means the patient stays radioactive.'],
+ sr:['Strontium-90: β⁻, half-life 29 years','<span class="bad">Unsuitable.</span> Beta is mostly absorbed in the body, so little reaches the detector and it ionises tissue. The half-life is far too long.'],
+ co:['Cobalt-60: γ, half-life 5.3 years','<span class="bad">Unsuitable.</span> Gamma is right, but the half-life is far too long: the patient would stay radioactive for years.'],
+ x:['Radon-222: α, half-life 3.8 days','<span class="bad">Unsuitable.</span> Alpha radiation cannot be detected outside the body, and radon is a gas that would be breathed out.']};
+topic({id:'uses',ref:'3.3.3',name:'Uses & safety',short:'Uses',eyebrow:'Applications and hazards',title:'Thickness gauges, tracers and handling sources safely',
+ intro:'A factory checks the thickness of a sheet by measuring how much radiation passes through it. Choose the source and the material, and see which combinations work.',animated:true,
+ bar:'thickness gauge on a production line',aspect:0.5,minH:250,
+ segs:[{id:'us-src',opts:[['a','α source'],['b','β⁻ source'],['g','γ source']],sel:1},{id:'us-mat',opts:[['paper','Paper'],['al','Aluminium foil'],['steel','Steel sheet']]},{id:'us-hl',opts:[['long','Half-life 30 years'],['short','Half-life 6 hours']]}],
+ controls:[{id:'us-x',label:'Sheet thickness',min:0,max:100,step:1,value:50,fmt:v=>''}],
+ extra:`<div class="row"><label for="us-tr"><b>Medical tracer:</b> choose an isotope for a scan</label><select id="us-tr"><option value="">Choose…</option>${Object.entries(TRACERS).filter(e=>e[0]).map(([k,v])=>`<option value="${k}">${v[0]}</option>`).join('')}</select></div><div class="feedback" id="us-fb">Pick an isotope to see whether it would work as a tracer.</div>`,
+ readouts:[{id:'us-th',label:'thickness'},{id:'us-c',label:'count rate'},{id:'us-later',label:'count rate 1 month later, same thickness'},{id:'us-rl',label:'rollers'}],status:true,
+ eqTitle:'Safe handling',eqs:['use tongs: keep your distance','minimise exposure time','store in a lead-lined box','never point a source at people','wash hands; no eating near sources'],
+ steps:['<b>Thickness monitoring</b>: radiation passes through the sheet to a detector. A thicker sheet absorbs more, so the count rate falls, and the rollers are adjusted to correct it.',
+  'Choose the radiation so that a small change in thickness gives a noticeable change in count rate. Paper and aluminium foil: <b>beta</b>. Alpha is stopped completely; gamma passes through almost unchanged. Thick steel: <b>gamma</b>, because beta is stopped.',
+  'A gauge source needs a <b>long half-life</b> so that the count rate does not fall noticeably over time. Otherwise a falling count rate would be mistaken for a thicker sheet.',
+  '<b>Medical tracers</b> such as technetium-99m: a <b>gamma</b> emitter, so the radiation leaves the body to be detected and causes little ionisation; a <b>short half-life</b> (hours), long enough for the scan, then the activity falls quickly. Gamma is also used to <b>sterilise</b> medical equipment and food, and to treat cancer.',
+  '<b>Dangers</b>: ionising radiation can kill cells or damage DNA, which can lead to cancer. The risk increases with the dose received.',
+  '<b>Irradiation</b> is exposure to radiation from a source outside the body; the person does not become radioactive. <b>Contamination</b> is when radioactive material gets onto or into the body, so the exposure continues.'],
+ traps:['Saying gamma is used for paper because it is "the strongest". It would pass straight through.','Saying a tracer should have a long half-life so that it "lasts". It would keep irradiating the patient.','Thinking irradiated food or equipment becomes radioactive. It does not.','Writing "wear gloves" as a precaution. Gloves give almost no protection against gamma or beta; distance, time and shielding are what matter.'],
+ tryThis:'find the only source that works for each material. Then switch the β⁻ source to a 6-hour half-life and look at the count rate one month later.'});
+sims.uses=(()=>{let tt=0,st={};
+ const rate=(src,mat,x)=>2000*Math.exp(-GAUGE[mat].mu[src]*x);
+ return{init(){$('us-tr').addEventListener('change',()=>{const v=TRACERS[$('us-tr').value];$('us-fb').innerHTML=v&&v[1]?v[1]:'Pick an isotope to see whether it would work as a tracer.'})},
+ update(){const src=segVal('us-src'),mat=segVal('us-mat'),g=GAUGE[mat],f=num('us-x')/100,x=g.r[0]+(g.r[1]-g.r[0])*(0.3+0.4*f),c=rate(src,mat,x);
+  const cmin=rate(src,mat,g.r[0]),cmax=rate(src,mat,g.r[1]),sens=(cmin-cmax)/Math.max(cmin,1e-9);st={src,mat,g,x,c,f};
+  $('us-th').textContent=fmt(x,mat==='steel'?1:3)+' mm';$('us-c').textContent=c<1?'≈ 0 counts min⁻¹':fmt(c,0)+' counts min⁻¹';
+  const later=segVal('us-hl')==='short'?c*Math.pow(2,-30*24/6):c*Math.pow(2,-(1/12)/30);$('us-later').textContent=later<1?'≈ 0 counts min⁻¹':fmt(later,0)+' counts min⁻¹';
+  const target=0.5,dev=f-target;$('us-rl').textContent=Math.abs(dev)<0.08?'no change needed':dev>0?'sheet too thick → press rollers closer':'sheet too thin → move rollers apart';
+  let v;if(cmin<5)v=`<span class="bad">Unsuitable.</span> ${RAD[src].nm} is completely absorbed by the ${g.nm}: the count rate is zero whatever the thickness.`;
+  else if(sens<0.15)v=`<span class="bad">Unsuitable.</span> ${RAD[src].nm} passes through the ${g.nm} almost unaffected, so the count rate hardly changes when the thickness changes.`;
+  else v=`<span class="ok">Suitable.</span> The count rate changes noticeably as the ${g.nm} gets thicker or thinner, so small changes can be detected.`;
+  if(segVal('us-hl')==='short')v+=' <b>But</b> a 6-hour half-life is too short: the count rate falls on its own within hours, so the gauge would wrongly read the sheet as getting thicker.';
+  $('uses-status').innerHTML=v;},
+ step(dt){tt+=dt},
+ draw(ctx,w,h){bg(ctx,w,h,false);const {src,mat,g,x,c,f}=st;const lw=w*0.56,cy=h*0.5;const thick=6+f*16;
+  // sheet and rollers
+  const sheetCol=mat==='paper'?alpha(C.muted,0.35):mat==='al'?alpha(C.accent,0.35):alpha(C.ink,0.6);ctx.fillStyle=sheetCol;ctx.fillRect(10,cy-thick/2,lw-20,thick);
+  const off=(tt*40)%40;ctx.strokeStyle=alpha(C.ink,0.25);ctx.lineWidth=1;for(let xx=10-off;xx<lw-10;xx+=40){ctx.beginPath();ctx.moveTo(Math.max(10,xx),cy-thick/2);ctx.lineTo(Math.max(10,xx),cy+thick/2);ctx.stroke()}
+  [[lw*0.18,'rollers']].forEach(([rx,l])=>{[-1,1].forEach(s=>{ctx.fillStyle=C.surface;ctx.strokeStyle=C.ink;ctx.lineWidth=1.5;ctx.beginPath();ctx.arc(rx,cy+s*(thick/2+16),16,0,7);ctx.fill();ctx.stroke();
+   const a=tt*3*s;line(ctx,rx,cy+s*(thick/2+16),rx+12*Math.cos(a),cy+s*(thick/2+16)+12*Math.sin(a),C.ink,1.2)});label(ctx,l,rx,cy+thick/2+44,C.muted,'center',10)});
+  label(ctx,'sheet moves →',lw-14,cy-thick/2-10,C.muted,'right',10);
+  const sx=lw*0.65;ctx.fillStyle=C.ink;rrect(ctx,sx-14,cy+thick/2+30,28,20,3);ctx.fill();label(ctx,'source',sx,cy+thick/2+62,C.muted,'center',10);
+  ctx.fillStyle=C.surface;ctx.strokeStyle=C.ink;ctx.lineWidth=2;rrect(ctx,sx-20,cy-thick/2-52,40,22,5);ctx.fill();ctx.stroke();label(ctx,'detector',sx,cy-thick/2-62,C.muted,'center',10);
+  const col=RAD[src].col();const n=8;for(let i=0;i<n;i++){const ph=((tt*0.9+i/n)%1);const y0=cy+thick/2+30,y1=cy-thick/2-30;const passFrac=Math.min(1,c/2000);
+   const stop=i/n>passFrac;const yy=y0+(y1-y0)*ph;if(stop&&yy<cy+thick/2)continue;dot(ctx,sx+(i-n/2)*2.2,yy,src==='a'?3.5:2.3,col)}
+  // graph
+  const P=Plot(ctx,{x:lw+44,y:24,w:w-lw-58,h:h-64},[g.r[0],g.r[1]],[0,2000]);P.axes('thickness / mm','count rate',[g.r[0],(g.r[0]+g.r[1])/2,g.r[1]],[0,1000,2000],v=>mat==='steel'?fmt(v,0):fmt(v,2),v=>v);
+  P.curve(xx=>rate(src,mat,xx),col,2.2);dot(ctx,P.X(x),P.Y(c),5,C.node);
+  const lo=g.r[0]+(g.r[1]-g.r[0])*0.3,hi=g.r[0]+(g.r[1]-g.r[0])*0.7;ctx.fillStyle=alpha(C.good,0.1);ctx.fillRect(P.X(lo),24,P.X(hi)-P.X(lo),h-64);label(ctx,'working range',(P.X(lo)+P.X(hi))/2,32,C.good,'center',9);}}})();
+Q.uses=[
+ {m:3,q:`<p>Explain why a beta source, rather than an alpha or a gamma source, is used to monitor the thickness of paper.</p>`,a:`<ul><li>Alpha would be completely absorbed by the paper: no count rate whatever the thickness.</li><li>Gamma would pass through almost unaffected: the count rate would hardly change.</li><li>Beta is partly absorbed, so the count rate changes noticeably with small changes in thickness.</li></ul>`},
+ {m:2,q:`<p>Explain why the source in a thickness gauge should have a long half-life.</p>`,a:`<p>The count rate should only change when the thickness changes. With a short half-life the activity, and so the count rate, would fall noticeably over time; this would be read as a thicker sheet, and the source would need replacing or recalibrating often.</p>`},
+ {m:3,q:`<p>A hospital needs a radioactive tracer to inject into a patient for a scan. State and explain two properties the isotope should have.</p>`,a:`<ul><li>It should emit <b>gamma</b>: it passes out of the body to the detector, and it is weakly ionising, so it causes less damage.</li><li>It should have a <b>short half-life</b> (a few hours): long enough to complete the scan, but the activity soon falls, which limits the patient's dose.</li><li>(Also accept: it should be non-toxic.)</li></ul>`},
+ {m:1,opts:['handling the source with long tongs','keeping the source in a lead-lined box when not in use','holding the source close to your eye to check the label','keeping the time spent near the source as short as possible'],key:'C',q:`<p>Which of these is <b>not</b> a suitable precaution when using a radioactive source?</p>`,a:`<p>Sources should never be pointed at, or held close to, the body. Increasing distance, reducing time and using shielding all reduce the dose.</p>`},
+ {m:2,q:`<p>Explain the difference between <b>irradiation</b> and <b>contamination</b>.</p>`,a:`<ul><li>Irradiation: exposure to radiation from a source outside the body. The object does not become radioactive, and exposure stops when you move away.</li><li>Contamination: radioactive material gets onto or into the body (or an object), so it keeps emitting radiation until it is removed or decays.</li></ul>`},
+ {m:2,q:`<p>A steel works monitors the thickness of steel sheets that are about 10 mm thick. Suggest which type of radiation should be used and why.</p>`,a:`<p class="final">Gamma</p><p>Alpha and beta would be completely absorbed by 10 mm of steel. Gamma is partly absorbed, so the count rate changes measurably with thickness.</p>`}];
+
+/* ===== PRACTICE (different questions) ===== */
+Q.practice=[
+ {t:'atom',m:1,opts:['1.6 × 10⁷ C kg⁻¹','3.2 × 10⁷ C kg⁻¹','4.8 × 10⁷ C kg⁻¹','9.6 × 10⁷ C kg⁻¹'],key:'B',q:`<p>What is the specific charge of a tritium nucleus, ³₁H?</p>`,a:`<div class="work">Q/m = 1.60×10⁻¹⁹ / (3 × 1.67×10⁻²⁷) = 3.19 × 10⁷ C kg⁻¹</div>`},
+ {t:'atom',m:3,q:`<p>A magnesium atom, ²⁴₁₂Mg, loses two electrons. Calculate the specific charge of the ion formed.</p>`,a:`<div class="work">Q = +2 × 1.60×10⁻¹⁹ = 3.20 × 10⁻¹⁹ C
+m ≈ 24 × 1.67×10⁻²⁷ = 4.01 × 10⁻²⁶ kg   (electron masses negligible)
+Q/m = 3.20×10⁻¹⁹ / 4.01×10⁻²⁶</div><p class="final">8.0 × 10⁶ C kg⁻¹</p>`},
+ {t:'atom',m:2,q:`<p>Iodine-127 (¹²⁷₅₃I) is stable. Iodine-131 is radioactive. State the number of neutrons in each nucleus and explain why both are iodine.</p>`,a:`<ul><li>I-127: 127 − 53 = <b>74</b> neutrons; I-131: 131 − 53 = <b>78</b> neutrons.</li><li>Both have 53 protons; the proton number decides the element. They are isotopes.</li></ul>`},
+ {t:'atom',m:1,opts:['14 protons, 6 neutrons','6 protons, 8 neutrons','8 protons, 6 neutrons','6 protons, 14 neutrons'],key:'B',q:`<p>What does the nucleus of ¹⁴₆C contain?</p>`,a:`<p>Z = 6 protons; N = 14 − 6 = 8 neutrons.</p>`},
+ {t:'rutherford',m:1,opts:['Electrons orbit the nucleus in shells.','The nucleus contains neutrons.','The positive charge and most of the mass are in a very small volume.','The atom is neutral overall.'],key:'C',q:`<p>A very small number of alpha particles were deflected through more than 90° by gold foil. What did this show?</p>`,a:`<p>Only a tiny, massive, positively charged nucleus could produce such large deflections.</p>`},
+ {t:'rutherford',m:3,q:`<p>Describe how the model of the atom changed as a result of the Rutherford scattering experiment.</p>`,a:`<ul><li>Before: the plum pudding model, a sphere of spread-out positive charge with electrons embedded in it.</li><li>After: the nuclear model, with a tiny, dense, positively charged nucleus at the centre that contains most of the mass.</li><li>Electrons are outside the nucleus, and most of the atom is empty space.</li></ul>`},
+ {t:'rutherford',m:2,q:`<p>In the Rutherford experiment the detector was a fluorescent screen viewed through a microscope. Explain how this detected alpha particles, and why the screen had to be moved to different positions.</p>`,a:`<ul><li>Each alpha particle hitting the screen produced a small flash of light, which could be counted.</li><li>The screen was moved around the foil to count alpha particles at different scattering angles.</li></ul>`},
+ {t:'radiation',m:4,q:`<p>Describe an experiment to find which types of radiation a sealed source emits. Include how you would make the results reliable.</p>`,a:`<ul><li>Measure the background count rate with a GM tube and counter, with the source away; repeat and average.</li><li>Place the source a fixed short distance (2–3 cm) from the GM tube and measure the count rate with no absorber.</li><li>Repeat with paper, then a few mm of aluminium, then a few cm of lead between the source and the tube; subtract background from each.</li><li>A large fall with paper → α; a large fall with aluminium → β; a count above background through aluminium → γ. Repeat each reading and average, because decay is random.</li></ul>`},
+ {t:'radiation',m:1,opts:['A decreases by 1, Z increases by 1','A is unchanged, Z increases by 1','A decreases by 4, Z decreases by 2','A is unchanged, Z decreases by 1'],key:'B',q:`<p>What happens to the nucleon number A and the proton number Z of a nucleus that emits a beta-minus particle?</p>`,a:`<p>A neutron changes into a proton: the number of nucleons stays the same and the proton number goes up by 1.</p>`},
+ {t:'radiation',m:2,q:`<p>Thorium-232 (Z = 90) decays by emitting an alpha particle, then two beta-minus particles. Determine the nucleon number and proton number of the final nucleus.</p>`,a:`<div class="work">α: A 232 → 228, Z 90 → 88
+β⁻: Z 88 → 89 ;  β⁻: Z 89 → 90</div><p class="final">A = 228, Z = 90 (thorium-228, an isotope of the original element)</p>`},
+ {t:'halflife',m:3,q:`<p>The corrected count rate from a cobalt-60 source is 640 counts min⁻¹. Cobalt-60 has a half-life of 5.3 years. Calculate how long it takes for the corrected count rate to fall to 40 counts min⁻¹.</p>`,a:`<div class="work">640 → 320 → 160 → 80 → 40 is 4 half-lives
+4 × 5.3 years</div><p class="final">21 years (21.2 years)</p>`},
+ {t:'halflife',m:2,q:`<p>A piece of ancient wood has 1/8 of the carbon-14 activity of the same mass of living wood. Carbon-14 has a half-life of 5700 years. Estimate the age of the wood.</p>`,a:`<div class="work">1/8 = (½)³ → 3 half-lives
+3 × 5700</div><p class="final">about 17 000 years</p>`},
+ {t:'halflife',m:4,q:`<p>A student measures the count rate from a short-lived source. The background count rate is 30 counts min⁻¹.</p><div class="tblwrap"><table class="ptable"><tr><th>Time / s</th><td>0</td><td>30</td><td>60</td><td>90</td><td>120</td></tr><tr><th>Measured count rate / counts min⁻¹</th><td>430</td><td>313</td><td>230</td><td>171</td><td>130</td></tr></table></div><p>(a) Explain why the background must be subtracted. (b) Use the data to determine the half-life.</p>`,a:`<ul><li>(a) The background is not from the source and does not decay, so it would make the source's count rate seem to fall more slowly, giving a half-life that is too long.</li><li>(b) Corrected: 400, 283, 200, 141, 100 counts min⁻¹. 400 → 200 takes 60 s; 200 → 100 takes another 60 s.</li></ul><p class="final">half-life = 60 s</p>`},
+ {t:'halflife',m:1,opts:['radon gas from rocks and soil','medical X-rays','cosmic rays','nuclear power stations'],key:'A',q:`<p>For most people in the UK, which is the largest source of background radiation?</p>`,a:`<p>Radon gas, which seeps out of rocks and soil and is breathed in.</p>`},
+ {t:'uses',m:3,q:`<p>Smoke alarms contain americium-241, an alpha emitter with a half-life of 430 years. Explain why an alpha emitter with a long half-life is suitable.</p>`,a:`<ul><li>Alpha is strongly ionising, so it ionises the air between two plates and a small current flows; smoke absorbs the alpha particles, the current falls and the alarm sounds.</li><li>Alpha has a very short range and is stopped by the casing, so it is safe for people nearby.</li><li>The long half-life means the activity stays almost constant for the life of the alarm.</li></ul>`},
+ {t:'uses',m:2,q:`<p>Medical equipment is sterilised by sealing it in plastic packaging and exposing it to gamma radiation. Explain why gamma is used, and why the equipment is safe to use afterwards.</p>`,a:`<ul><li>Gamma penetrates the sealed packaging and kills bacteria on the equipment.</li><li>The equipment is irradiated, not contaminated, so it does not become radioactive.</li></ul>`},
+ {t:'uses',m:1,opts:['an alpha emitter with a half-life of 6 hours','a gamma emitter with a half-life of 6 hours','a gamma emitter with a half-life of 30 years','a beta emitter with a half-life of 8 days'],key:'B',q:`<p>Which isotope would be most suitable as a tracer injected into a patient?</p>`,a:`<p>Gamma escapes the body to be detected and is weakly ionising; a half-life of hours keeps the patient's dose low.</p>`},
+ {t:'uses',m:2,q:`<p>A technician moves a source using tongs 30 cm long instead of by hand. Explain why this reduces the dose the technician receives.</p>`,a:`<p>The radiation spreads out (and some is absorbed by air) as it travels, so the further the hands are from the source, the less radiation reaches them. Contact with the source, and contamination of the skin, is also avoided.</p>`}];
+
+/* ---------- build page ---------- */
+(function build(){
+  const S=SECTION;
+  const ctlHTML=c=>`<div class="ctl"><label for="${c.id}">${c.label} <output id="${c.id}-o"></output></label><input type="range" id="${c.id}" min="${c.min}" max="${c.max}" step="${c.step}" value="${c.value}"></div>`;
+  const segHTML=s=>`<div class="seg" id="${s.id}">${s.opts.map((o,i)=>`<button type="button" aria-pressed="${i===(s.sel||0)}" data-v="${o[0]}">${o[1]}</button>`).join('')}</div>`;
+  const chkHTML=c=>`<label class="check"><input type="checkbox" id="${c.id}"${c.checked?' checked':''}> ${c.label}</label>`;
+  const panel=t=>`
+<section class="panel" role="tabpanel" data-panel="${t.id}" hidden>
+  <div class="panel-head"><div><div class="eyebrow">${t.eyebrow}</div><h2>${t.title}</h2><p>${t.intro}</p></div></div>
+  <div class="lab">
+    <div class="scope">
+      <div class="scope-bar"><span id="${t.id}-bar">${t.bar||''}</span>${t.animated?`<button class="pause" type="button" data-pause="${t.id}">Pause</button>`:''}</div>
+      <canvas id="c-${t.id}" aria-label="${t.title} simulation"></canvas>
+      ${(t.segs||t.checks)?`<div class="toggles">${(t.segs||[]).map(segHTML).join('')}${(t.checks||[]).map(chkHTML).join('')}</div>`:''}
+      ${t.controls?`<div class="controls">${t.controls.map(ctlHTML).join('')}</div>`:''}
+      ${t.extra?`<div class="extra">${t.extra}</div>`:''}
+      ${t.readouts?`<dl class="readout">${t.readouts.map(r=>`<div${r.wide?' style="grid-column:1/-1"':''}><dt>${r.label}</dt><dd id="${r.id}"></dd></div>`).join('')}</dl>`:''}
+      ${t.status?`<div class="status" id="${t.id}-status"></div>`:''}
+    </div>
+    <div class="notes">
+      <div class="eqbox"><h3>${t.eqTitle||'Key equations'}</h3><div class="eq">${t.eqs.map(e=>`<span>${e}</span>`).join('')}</div></div>
+      <div><h3>Breaking it down</h3><ol class="steps">${t.steps.map(s=>`<li><div>${s}</div></li>`).join('')}</ol></div>
+      <div class="traps"><h3>Key misconceptions</h3><ul>${t.traps.map(s=>`<li>${s}</li>`).join('')}</ul></div>
+      ${t.tryThis?`<p class="try"><b>Try this:</b> ${t.tryThis}</p>`:''}
+    </div>
+  </div>
+  <div class="qhead"><h3>Exam-style questions: ${t.name.toLowerCase()}</h3><p><span class="qtally" data-tally="${t.id}"></span> · Answer each question first, then check it.</p></div>
+  <div class="qgrid" data-qset="${t.id}"></div>
+</section>`;
+  const chips=[['all','All'],['mc','Multiple choice'],...TOPICS.map(t=>[t.id,t.short||t.name]),['long','3+ marks']];
+  document.getElementById('app').innerHTML=`
+<div class="wrap"><header class="top">
+  <div class="eyebrow">OxfordAQA International AS Physics 9630 · Unit 1 · ${S.code}</div>
+  <h1>${S.title}</h1><p class="lede">${S.lede}</p></header></div>
+<nav class="tabs" aria-label="Topics"><div class="wrap"><div class="tabrow" role="tablist" id="tablist">
+  ${TOPICS.map(t=>`<button class="tab" type="button" role="tab" data-tab="${t.id}"><span class="ref">${t.ref}</span><span class="nm">${t.name}</span></button>`).join('')}
+  <button class="tab practice" type="button" role="tab" data-tab="practice"><span class="ref">Mixed</span><span class="nm">Exam practice</span></button>
+</div></div></nav>
+<main class="wrap">
+${TOPICS.map(panel).join('')}
+<section class="panel" role="tabpanel" data-panel="practice" hidden>
+  <div class="panel-head"><div><div class="eyebrow">Mixed exam-style questions</div><h2>Exam practice</h2>
+  <p>New questions across all five topics, different from the ones on the topic tabs. Write your answer or pick an option, check it against the answer, then mark how you did.</p></div></div>
+  <div class="filters" id="filters">${chips.map((c,i)=>`<button class="chip" type="button" aria-pressed="${i===0}" data-f="${c[0]}">${c[1]}</button>`).join('')}
+    <span class="tally" id="tally"></span><button class="ghost" type="button" id="reset">Clear my answers</button></div>
+  <div class="qgrid" data-qset="practice"></div>
+</section>
+</main>
+<div class="wrap"><footer>${S.footer}</footer></div>`;
+})();
+
+/* ---------- question cards (answer unlocks after an attempt) ---------- */
+const LET='ABCD';
+function card(item,idx,lab,set){
+  const el=document.createElement('article');el.className='qcard';const mc=!!item.opts;
+  el.dataset.tags=(item.t||'')+(mc?' mc':'')+(item.m>=3?' long':'');
+  el.innerHTML=`<div class="qmeta"><span class="side">${lab}${idx+1}</span><span class="mk">${item.m} mark${item.m>1?'s':''}</span></div>
+    <div class="qbody">${item.q}</div>
+    ${mc?`<div class="optlist" role="group" aria-label="Options">${item.opts.map((o,i)=>`<button type="button" class="opt" data-l="${LET[i]}" aria-pressed="false"><span class="lt">${LET[i]}</span><span>${o}</span></button>`).join('')}</div>`
+       :`<textarea class="attempt" id="att-${set}-${idx}" aria-label="Your answer to ${lab}${idx+1}" placeholder="Write your answer here first…"></textarea>`}
+    <div class="cardfoot"><button class="flip" type="button" disabled>Show answer</button><span class="hint">${mc?'Choose an option to unlock the answer':'Write an answer to unlock the answer'}</span></div>
+    <div class="ansbox ans" hidden><div class="tagline" style="margin-bottom:6px">Answer${mc?' · '+item.key:''}</div>${item.a}
+      <div class="selfmark" style="margin-top:8px">How did you do? <button type="button" data-s="got" aria-pressed="false">Got it</button><button type="button" data-s="rev" aria-pressed="false">Need to review</button></div></div>`;
+  const btn=el.querySelector('.flip'),ans=el.querySelector('.ans'),hint=el.querySelector('.hint');
+  const unlock=on=>{btn.disabled=!on;hint.hidden=on};
+  if(mc){el.querySelectorAll('.opt').forEach(o=>o.addEventListener('click',()=>{if(el.classList.contains('locked'))return;el.querySelectorAll('.opt').forEach(x=>x.setAttribute('aria-pressed',x===o));el.dataset.pick=o.dataset.l;unlock(true)}))}
+  else{const ta=el.querySelector('textarea');ta.addEventListener('input',()=>unlock(ta.value.trim().length>=3))}
+  btn.addEventListener('click',()=>{const show=ans.hidden;ans.hidden=!show;btn.textContent=show?'Hide answer':'Show answer';el.classList.toggle('flipped',show);
+    if(mc&&show){el.classList.add('locked');el.querySelector('.optlist').classList.add('locked');el.querySelectorAll('.opt').forEach(o=>{if(o.dataset.l===item.key)o.classList.add('right');else if(o.dataset.l===el.dataset.pick)o.classList.add('wrong')})}
+    tallies();});
+  el.querySelectorAll('.selfmark button').forEach(b=>b.addEventListener('click',()=>{const on=b.getAttribute('aria-pressed')!=='true';el.querySelectorAll('.selfmark button').forEach(x=>x.setAttribute('aria-pressed',x===b&&on));
+    el.classList.toggle('got',on&&b.dataset.s==='got');el.classList.toggle('rev',on&&b.dataset.s==='rev');tallies()}));
+  el._reset=()=>{ans.hidden=true;btn.textContent='Show answer';el.classList.remove('flipped','locked','got','rev');delete el.dataset.pick;unlock(false);
+    const ta=el.querySelector('textarea');if(ta)ta.value='';el.querySelectorAll('.opt').forEach(o=>{o.setAttribute('aria-pressed','false');o.classList.remove('right','wrong')});
+    const ol=el.querySelector('.optlist');if(ol)ol.classList.remove('locked');el.querySelectorAll('.selfmark button').forEach(x=>x.setAttribute('aria-pressed','false'))};
+  return el;}
+document.querySelectorAll('[data-qset]').forEach(g=>{const set=g.dataset.qset;(Q[set]||[]).forEach((it,i)=>g.appendChild(card(it,i,set==='practice'?'P':'Q',set)))});
+function tallies(){document.querySelectorAll('[data-tally]').forEach(s=>{const g=document.querySelector(`[data-qset="${s.dataset.tally}"]`);const cs=[...g.querySelectorAll('.qcard')];
+  s.textContent=`${cs.filter(c=>c.classList.contains('got')).length} of ${cs.length} marked "got it"`});applyFilter(curF)}
+const pgrid=document.querySelector('[data-qset="practice"]');let curF='all';
+function applyFilter(f){curF=f;let n=0,marks=0,got=0;pgrid.querySelectorAll('.qcard').forEach((c,i)=>{const show=f==='all'||c.dataset.tags.split(' ').includes(f);c.hidden=!show;if(show){n++;marks+=Q.practice[i].m;if(c.classList.contains('got'))got+=Q.practice[i].m}});
+  $('tally').textContent=`${n} questions · ${marks} marks · ${got} marks "got it"`;}
+$('filters').addEventListener('click',e=>{const b=e.target.closest('.chip');if(!b)return;document.querySelectorAll('.chip').forEach(c=>c.setAttribute('aria-pressed',c===b));applyFilter(b.dataset.f)});
+$('reset').addEventListener('click',()=>{pgrid.querySelectorAll('.qcard').forEach(c=>c._reset());tallies()});
+tallies();
+
+/* ---------- theme ---------- */
+readTokens();
+try{matchMedia('(prefers-color-scheme: dark)').addEventListener('change',readTokens)}catch(e){}
+new MutationObserver(readTokens).observe(document.documentElement,{attributes:true,attributeFilter:['data-theme','class','style']});
+
+/* ---------- wire controls ---------- */
+TOPICS.forEach(t=>{const s=sims[t.id]||{};const upd=()=>{(t.controls||[]).forEach(c=>setOut(c.id,c.fmt?c.fmt(+$(c.id).value):$(c.id).value));s.update&&s.update()};
+  t._upd=upd;
+  (t.controls||[]).forEach(c=>$(c.id).addEventListener('input',upd));
+  (t.checks||[]).forEach(c=>$(c.id).addEventListener('change',upd));
+  (t.segs||[]).forEach(sg=>$(sg.id).addEventListener('click',e=>{const b=e.target.closest('button');if(!b)return;setSeg(sg.id,b.dataset.v);s.onSeg&&s.onSeg(sg.id,b.dataset.v);upd()}));
+  s.init&&s.init();upd();});
+
+/* ---------- tabs + animation ---------- */
+const tabs=[...document.querySelectorAll('.tab')];let active=TOPICS[0].id;const times={},paused={};
+const reduce=matchMedia('(prefers-reduced-motion: reduce)').matches;
+function show(id,push){if(!document.querySelector(`[data-panel="${id}"]`))id=TOPICS[0].id;active=id;
+  tabs.forEach(t=>{const on=t.dataset.tab===id;t.setAttribute('aria-selected',on);t.tabIndex=on?0:-1});
+  document.querySelectorAll('.panel').forEach(p=>p.hidden=p.dataset.panel!==id);
+  if(push&&location.hash!=='#'+id){try{history.replaceState(null,'','#'+id)}catch(e){}}
+  const t=tabs.find(t=>t.dataset.tab===id);t&&t.scrollIntoView({block:'nearest',inline:'nearest'});
+  drawActive();}
+tabs.forEach(t=>t.addEventListener('click',()=>{show(t.dataset.tab,true);window.scrollTo({top:0})}));
+$('tablist').addEventListener('keydown',e=>{const i=tabs.findIndex(t=>t.dataset.tab===active);let j=i;
+  if(e.key==='ArrowRight')j=(i+1)%tabs.length;else if(e.key==='ArrowLeft')j=(i-1+tabs.length)%tabs.length;else return;
+  e.preventDefault();show(tabs[j].dataset.tab,true);tabs[j].focus();});
+window.addEventListener('hashchange',()=>show(location.hash.slice(1)));
+document.querySelectorAll('[data-pause]').forEach(b=>{const k=b.dataset.pause;paused[k]=reduce;b.textContent=reduce?'Play':'Pause';
+  b.addEventListener('click',()=>{paused[k]=!paused[k];b.textContent=paused[k]?'Play':'Pause'})});
+function drawActive(){const s=sims[active],t=TOPICS.find(x=>x.id===active);if(!s||!s.draw)return;const cv=$('c-'+active);
+  const{ctx,w,h}=sizeCanvas(cv,t.aspect||0.55,t.minH||240);s.draw(ctx,w,h,times[active]||0);}
+let last=performance.now();
+function loop(now){const dt=Math.min(0.05,(now-last)/1000);last=now;const s=sims[active],t=TOPICS.find(x=>x.id===active);
+  if(s&&t){if(t.animated&&!paused[active]){times[active]=(times[active]||0)+dt;s.step&&s.step(dt,times[active])}drawActive()}
+  requestAnimationFrame(loop)}
+show(location.hash.slice(1)||TOPICS[0].id);requestAnimationFrame(loop);
+</script>
+
+</body></html>
